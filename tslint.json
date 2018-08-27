@@ -1,0 +1,37 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended",
+        "tslint-microsoft-contrib"
+    ],
+    "jsRules": {},
+    "rules": {
+        "quotemark": [true, "single"],
+        "indent": [true, "spaces", 4],
+        "interface-name": false,
+        "export-name": false,
+        "align": false,
+        "variable-name": false,
+        "insecure-random": false,
+        "prefer-type-cast": false,
+        "no-default-export": false,
+        "no-shadowed-variable":false,
+        "no-any": false,
+        "no-import-side-effect": [true, {"ignore-module": "(\\.html|\\.css|\\.less|reflect-metadata)$"}],
+        "import-name": false,
+        
+        "typedef": false,
+        "no-relative-imports": false,
+        "no-reserved-keywords": false,
+        "react-this-binding-issue": false,
+        "curly": false,
+        "no-this-assignment": false,
+        "no-non-null-assertion": false,
+        "no-console": false,
+        "missing-jsdoc": false,
+        "ordered-imports": false,
+        "object-literal-sort-keys": false,
+        "no-consecutive-blank-lines": false
+    },
+    "rulesDirectory": []
+}

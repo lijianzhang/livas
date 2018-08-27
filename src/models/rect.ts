@@ -9,7 +9,7 @@ export default class RectModel extends BaseModel {
      */
     @attr
     public readonly border: {
-        width: number,
+        width: number;
         style:  'solid' | 'dashed' ;
         color: string;
         radius: number;

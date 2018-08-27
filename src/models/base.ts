@@ -2,10 +2,11 @@
  * @Author: lijianzhang
  * @Date: 2018-08-26 13:46:46
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-27 00:38:30
+ * @Last Modified time: 2018-08-27 10:17:50
  */
 import 'reflect-metadata';
-import { IPostion, ISize } from "../types/postion";
+
+import { IPostion, ISize } from '../types/postion';
 
 const attrsMetadataKey = Symbol('attrs');
 
@@ -13,10 +14,34 @@ export function attr(target: any, key: string) {
     const attrs = Reflect.getOwnMetadata(attrsMetadataKey, target) || [];
     attrs.push(key);
     Reflect.defineMetadata(attrsMetadataKey, attrs, target);
-};
+}
 
 
 export default class BaseModel {
+
+    get attrNames() {
+        if (this._attrNames) return this._attrNames;
+        const arr: string[] = [];
+        let target: any = this;
+        let stop = false;
+        while (!stop) {
+            const data = Reflect.getMetadata(attrsMetadataKey, target);
+            arr.push(...data);
+            if (target.constructor === BaseModel) {
+                stop = true;
+            } else {
+                const nextTarget = target.__proto__.__proto__;
+                if (!nextTarget || nextTarget === target) {
+                    stop = true;
+                } else {
+                    target = nextTarget;
+                }
+            }
+        }
+        this._attrNames = arr;
+
+        return arr;
+    }
     /**
      * 元素坐标
      */
@@ -33,7 +58,7 @@ export default class BaseModel {
      * 元素锚点
      */
     @attr
-    public  anchor: IPostion = { x: 0, y: 0 }
+    public  anchor: IPostion = { x: 0, y: 0 };
 
     /**
      * 线框颜色
@@ -76,39 +101,15 @@ export default class BaseModel {
     @attr
     public visible: boolean = true;
 
-    private _attrNames!: string[];
-
-    get attrNames() {
-        if (this._attrNames) return this._attrNames;
-        const arr: string[] = [];
-        (window as any).a = this;
-        let target: any = this;
-        let stop = false;
-        while(!stop) {
-            const data = Reflect.getMetadata(attrsMetadataKey, target);
-            arr.push(...data);
-            if (target.constructor === BaseModel) {
-                stop = true
-            } else {
-                const nextTarget = (target as any).__proto__.__proto__;
-                if (!nextTarget || nextTarget === target) {
-                    stop = true;
-                } else {
-                    target = nextTarget;
-                }
-            }
-        }
-        this._attrNames = arr;
-        return arr;
-    }
-
 
     /**
      * 背景色
      */
     public backgroundColor: string = '';
 
-    set<T extends keyof this>(key: T, value: this[T]) {
-        this[key]= value;
+    private _attrNames!: string[];
+
+    public set<T extends keyof this>(key: T, value: this[T]) {
+        this[key] = value;
     }
 }

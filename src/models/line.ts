@@ -1,7 +1,8 @@
 import { observable } from 'liob';
-import Base from './base';
+import Base, { attr } from './base';
 
 @observable
 export default class Line extends Base {
-    pos: { x: number, y: number }[] = [];
+    @attr
+    public pos: { x: number; y: number }[] = [];
 }
