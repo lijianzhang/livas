@@ -14,7 +14,6 @@ canvas.canvas.addEventListener('mousedown', e => {
     line.data.lineWidth = 5;
     line.data.opacity = 1;
     line.data.strokeColor = '#ff5a5e';
-    line.data.postion = { x: e.clientX, y: e.clientY };
     line.data.pos.push({ x: e.clientX, y: e.clientY });
 });
 

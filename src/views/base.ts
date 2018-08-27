@@ -50,13 +50,6 @@ export default abstract class BaseElement {
         this.rootCanvas.forceUpdate();
     }
 
-    get boundRect() {
-        return {
-            ...this.data.size,
-            ...this.data.postion
-        };
-    }
-
     get useCache() {
         return false;
     }
@@ -84,7 +77,8 @@ export default abstract class BaseElement {
     public render(ctx: CanvasRenderingContext2D) {
         if (!this.useCache) return this.draw(ctx);
         if (!this.rootCanvas) return null;
-        const { x, y, w, h } = this.boundRect;
+        const { x, y } = this.data.postion;
+        const { w, h } = this.data.size;
         if (w === 0 || h === 0) return null;
         if (!this._cacheContext) {
             const canvas = document.createElement('canvas');
