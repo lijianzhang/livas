@@ -523,7 +523,7 @@ babel-plugin-transform-strict-mode@^6.24.1:
 
 babel-preset-env@^1.7.0:
   version "1.7.0"
-  resolved "http://r.cnpmjs.org/babel-preset-env/download/babel-preset-env-1.7.0.tgz#dea79fa4ebeb883cd35dab07e260c1c9c04df77a"
+  resolved "https://registry.yarnpkg.com/babel-preset-env/-/babel-preset-env-1.7.0.tgz#dea79fa4ebeb883cd35dab07e260c1c9c04df77a"
   dependencies:
     babel-plugin-check-es2015-constants "^6.22.0"
     babel-plugin-syntax-trailing-function-commas "^6.22.0"

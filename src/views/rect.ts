@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-28 18:47:40
+ * @Last Modified time: 2018-08-28 22:52:21
  */
 import BaseView from './base';
 import ShapeModel from '../models/shape';
@@ -24,9 +24,7 @@ import ShapeModel from '../models/shape';
 
         const { x, y, w, h } = this.data.frame;
 
-        console.log(x, y, w, h);
-
-        if (this.data.lineWidth) {
+        if (this.data.lineWidth && this.data.strokeColor) {
             ctx.lineWidth = this.data.lineWidth;
             ctx.strokeStyle = this.data.strokeColor;
             ctx.lineCap = this.data.lineCap;
@@ -34,8 +32,10 @@ import ShapeModel from '../models/shape';
             ctx.strokeRect(x, y, w, h);
         }
 
+        if (this.data.backgroundColor) {
+            ctx.fillStyle = this.data.backgroundColor;
+            ctx.fillRect(x, y, w, h);
+        }
 
-        ctx.fillStyle = this.data.fillColor;
-        ctx.fillRect(x, y, w, h);
     }
  }

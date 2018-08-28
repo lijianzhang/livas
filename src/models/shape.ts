@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-28 18:21:26
+ * @Last Modified time: 2018-08-28 22:20:43
  */
 import BaseModel, { attr } from './base';
 import { IPostion, ISize } from '../types/postion';
@@ -23,19 +23,11 @@ import { IPostion, ISize } from '../types/postion';
      * @memberof ShapeModel
      */
     @attr
-    public fillColor: string = '#fff';
+    public backgroundColor?: string;
 
-    /**
-     * 是否填充
-     *
-     * @type {boolean}
-     * @memberof ShapeModel
-     */
-    @attr
-    public isFill: boolean = false;
 
     get padding() {
-        const w = Math.floor(this.lineWidth / 2);
+        const w = Math.ceil(this.lineWidth / 2);
 
         return {
             top: w,

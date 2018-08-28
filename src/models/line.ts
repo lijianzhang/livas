@@ -5,6 +5,7 @@
  * @Last Modified time: 2018-08-28 17:44:44
  */
 import BrushModel from './brush';
+import { IPostion } from '../types/postion';
 
 
  export default class LineModel extends BrushModel {
@@ -21,5 +22,13 @@ import BrushModel from './brush';
 
     get endPostion() {
         return this.postions[1];
+    }
+
+    set startPostion(value: IPostion) {
+        this.postions[0] = value;
+    }
+
+    set endPostion(value: IPostion) {
+        this.postions[1] = value;
     }
  }

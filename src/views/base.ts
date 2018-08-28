@@ -1,14 +1,15 @@
-import CachePool from '../utils/cache-pool';
-import BaseModel from '../models/base';
-import Canvas from '../canvas';
-import { Observer, observable } from 'liob';
 
 /*
  * @Author: lijianzhang
  * @Date: 2018-08-28 14:18:55
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-28 18:48:10
+ * @Last Modified time: 2018-08-29 00:21:09
  */
+
+import CachePool from '../utils/cache-pool';
+import BaseModel from '../models/base';
+import Canvas from '../canvas';
+import { Observer, observable } from 'liob';
 
 const cachePool = new CachePool(999);
 
@@ -129,13 +130,11 @@ export default abstract class BaseView {
         if (!this.rootCanvas || !this.data.visible || this.data.isEmpty) return null;
         if (!this.useCache) return this.draw(ctx);
         const { x, y, w, h } = this.data.frame;
-        console.log('frame:', x, y, w, h);
         const { left, top, bottom, right } = this.data.padding;
-        console.log('padding:', left, top, bottom, right);
         if (this.cacheCanvasContext) {
             if (this.changed) {
-                this.cacheCanvasContext.canvas.width = Math.abs(w) + left + right + 1;
-                this.cacheCanvasContext.canvas.height = Math.abs(h) + top + bottom + 1;
+                this.cacheCanvasContext.canvas.width = Math.abs(w) + left + right + 2;
+                this.cacheCanvasContext.canvas.height = Math.abs(h) + top + bottom + 2;
                 this.cacheCanvasContext.clearRect(0, 0, w, h);
                 this.cacheCanvasContext.save();
                 this.cacheCanvasContext.translate(Math.ceil(- x + left) + 1 - (w > 0 ? 0 : w), Math.ceil(-y + top) + 1 - (h > 0 ? 0 : h));

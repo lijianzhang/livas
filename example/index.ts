@@ -1,9 +1,8 @@
 import { Canvas, BrushView, RectView } from '../src';
 
+const canvas = new Canvas(document.getElementById('canvas'), innerWidth, 504);
 
-const canvas = new Canvas(document.getElementById('canvas'), 891, 504);
-
-canvas.draw();
+canvas.canvas.style.border = '1px solid #000';
 
 // 线条
 // let line: BrushView = null;
@@ -29,28 +28,28 @@ canvas.draw();
 let rect: RectView = null;
 let preX = 0;
 let preY = 0;
-canvas.canvas.addEventListener('mousedown', e => {
+canvas.addMouseEventListener('mousedown', (_, pos) => {
     rect = new RectView();
     canvas.addView(rect);
     rect.data.lineWidth = 1;
     rect.data.opacity = 1;
     rect.data.strokeColor = '#ff5a5e';
-    rect.data.isFill = Math.random() > 0.5;
-    rect.data.fillColor = '#ff5a5e';
-    rect.data.postion = ({ x: e.clientX, y: e.clientY });
-    preX = e.clientX;
-    preY = e.clientY;
+    rect.data.backgroundColor =  Math.random() > 0.5 ? '#ff5a5e' : '';
+    rect.data.postion = pos;
+    preX = pos.x;
+    preY = pos.y;
 
 });
 
-canvas.canvas.addEventListener('mousemove', e => {
+canvas.addMouseEventListener('mousemove', (_, pos) => {
     if (!rect) return;
-    const diffX = e.clientX - preX;
-    const diffY = e.clientY - preY;
+    const diffX = pos.x - preX;
+    const diffY = pos.y - preY;
     rect.data.size.w += diffX;
     rect.data.size.h += diffY;
-    preX = e.clientX;
-    preY = e.clientY;
+    // rect.changed = true;
+    preX = pos.x;
+    preY = pos.y;
 });
 
 canvas.canvas.addEventListener('mouseup', () => {
@@ -59,14 +58,14 @@ canvas.canvas.addEventListener('mouseup', () => {
     preY = 0;
 });
 
-// for (let index = 0; index < 50; index += 1) {
-//     const el = new LineView();
-//     canvas.addView(el);
-//     el.data.lineWidth = 5;
-//     el.data.opacity = 1;
-//     el.data.strokeColor = '#ff5a5e';
-//     el.data.postion = { x: Math.floor(Math.random() * 891), y: Math.floor(Math.random() * 504) };
-//     for (let i = 0; Math.floor(Math.random() * 100); i += 1) {
-//         el.data.pos.push({ x: Math.floor(Math.random() * 891), y: Math.floor(Math.random() * 504) });
-//     }
-// }
+for (let index = 0; index < 2000; index += 1) {
+    const el = new RectView();
+    canvas.addView(el);
+    el.data.lineWidth = 5;
+    el.data.opacity = 1;
+    el.data.strokeColor = '#ff5a5e';
+    el.data.backgroundColor =  Math.random() > 0.5 ? '#ff5a5e' : '';
+    el.data.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * 504) };
+    el.data.size = { w: 20, h: 20 };
+}
+// canvas.draw();

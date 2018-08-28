@@ -36,7 +36,7 @@ import { IPostion } from '../types/postion';
     }
 
     get padding() {
-        const w = Math.floor(this.lineWidth / 2);
+        const w = Math.ceil(this.lineWidth / 2);
 
         return {
             top: w,

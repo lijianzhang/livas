@@ -23,7 +23,6 @@ export default class CachePool {
             return false;
         } else {
             const canvas = document.createElement('canvas');
-            document.body.appendChild(canvas);
             const ctx = canvas.getContext('2d')!;
             this.useCaches.push(ctx);
 
@@ -35,5 +34,6 @@ export default class CachePool {
         const index = this.useCaches.findIndex(c => c === cache);
         this.useCaches.splice(index, 1);
         this.freeCaches.push(cache);
+        cache.clearRect(0, 0,cache.canvas.width, cache.canvas.height);
     }
 }
