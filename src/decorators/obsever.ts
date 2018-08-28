@@ -18,8 +18,10 @@ export default function toObserver(target) {
             ob[baseRenderKey] = ob.render.bind(ob);
 
             ob.$observer = new Observer(() => {
-                ob.changed = true;
-                ob.forceUpdate();
+                if (!ob.changed) {
+                    ob.changed = true;
+                    ob.forceUpdate();
+                }
             }, `${ob.name || ob.constructor.name}.render()`);
 
             ob.render = reactiveRender.bind(ob);

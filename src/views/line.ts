@@ -1,17 +1,22 @@
-import Base from './base';
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-08-28 15:05:32
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-08-28 17:00:20
+ */
+import BaseView from './base';
 import LineModel from '../models/line';
-import Observer from '../decorators/obsever';
-@Observer
-export default class Line extends Base {
 
-    public data = new LineModel();
+
+ export default class BrushView extends BaseView {
+
+    public useCache = true;
+
+    public data: LineModel;
+
     constructor() {
         super();
-    }
-
-
-    get useCache() {
-        return true;
+        this.data = new LineModel();
     }
 
     public draw(ctx: CanvasRenderingContext2D) {
@@ -22,18 +27,8 @@ export default class Line extends Base {
         ctx.globalAlpha = this.data.opacity;
         ctx.beginPath();
 
-        let p1 = this.data.pos[0];
-        let p2 = this.data.pos[1];
-        const { x, y } = this.getPrecisePosition(p1);
-        ctx.moveTo(x, y);
-        for (let index = 1; index < this.data.pos.length; index += 1) {
-            const { x, y } = this.getPrecisePosition(p1);
-            const minPoint = this.midPointBtw(p1, p2);
-            ctx.quadraticCurveTo(x, y, minPoint.x, minPoint.y);
-            p1 = p2;
-            p2 = this.data.pos[index + 1];
-        }
-        ctx.lineTo(p1.x, p1.y);
+        ctx.moveTo(this.data.startPostion.x, this.data.startPostion.y);
+        ctx.lineTo(this.data.endPostion.x, this.data.endPostion.y);
         ctx.stroke();
     }
-}
+ }

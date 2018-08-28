@@ -1,107 +1,153 @@
-import Base from '../models/base';
+import CachePool from '../utils/cache-pool';
+import BaseModel from '../models/base';
 import Canvas from '../canvas';
-import { IPostion } from '../types/postion';
+import { Observer, observable } from 'liob';
 
-let id = 0;
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-08-28 14:18:55
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-08-28 18:48:10
+ */
 
-export interface State {
-    x: number;
-    y: number;
+const cachePool = new CachePool(999);
 
-    w: number;
-    h: number;
 
-    lineWidth?: number;
-    fillStyle?: string;
-}
+export default abstract class BaseView {
 
-export default abstract class BaseElement {
+    get data() {
+        return this._data;
+    }
 
-    get cache() {
-        if (!this._cacheContext) {
-            const canvas = document.createElement('canvas');
-            canvas.width = this.data.size.w;
-            canvas.height = this.data.size.h;
-            this._cacheContext = canvas.getContext('2d')!;
-            this.draw(this._cacheContext);
-        } else if (this.changed) {
-            this.draw(this._cacheContext);
-            this.changed = false;
+    set data(value: BaseModel) {
+        this._data = observable(value);
+    }
+
+    get cacheCanvasContext() {
+        if (this._cacheCanvasContext) return this._cacheCanvasContext;
+        const cache = cachePool.getCache();
+        if (cache) {
+            this._cacheCanvasContext = cache;
+
+            return this._cacheCanvasContext;
         }
 
-        return this._cacheContext.canvas;
+        return false;
     }
+
+
+    /**
+     * 父级View
+     */
+    public parent?: BaseView;
+
+    /**
+     * 是否使用缓存
+     *
+     * @abstract
+     * @type {boolean}
+     * @memberof BaseView
+     */
+    public abstract useCache: boolean;
 
     public rootCanvas!: Canvas;
 
-    public abstract readonly data: Base;
+    private $observer: any;
 
-    public readonly id: number;
+    /**
+     * 判断元素需不需要重新渲染
+     *
+     * @private
+     * @type {boolean}
+     * @memberof BaseView
+     */
+    private changed: boolean = true;
 
-    public changed = false;
+    private _data!: BaseModel;
 
-    private _cacheContext?: CanvasRenderingContext2D;
+    /**
+     * 缓存的离屏上下文
+     *
+     * @private
+     * @type {CanvasRenderingContext2D}
+     * @memberof BaseView
+     */
+    private _cacheCanvasContext?: CanvasRenderingContext2D;
+
     constructor() {
-        id += 1;
-        this.id = id;
+        this.$observer = new Observer(() => {
+            this.changed = true;
+            this.forceUpdate();
+        }, `${this.constructor.name}.render()`);
     }
 
     public forceUpdate() {
         this.rootCanvas.forceUpdate();
     }
 
-    get useCache() {
-        return false;
-    }
-
+    /**
+     * 各个子类需要实现的渲染方法
+     *
+     * @abstract
+     * @param {CanvasRenderingContext2D} ctx
+     * @returns {*}
+     * @memberof BaseView
+     */
     public abstract draw(ctx: CanvasRenderingContext2D): void;
 
-    public midPointBtw(p1: IPostion, p2: IPostion) {
-        return {
-          x: p1.x + (p2.x - p1.x) / 2,
-          y: p1.y + (p2.y - p1.y) / 2
-        };
-    }
 
-    public getPrecisePosition(postion: IPostion) {
-        if (this.data.lineWidth % 2 === 0) {
-            return postion;
+    /**
+     * 销毁图形时候触发
+     *
+     * @memberof BaseView
+     */
+    public destory() {
+        if (this._cacheCanvasContext) {
+            cachePool.freeCache(this._cacheCanvasContext);
+            this._cacheCanvasContext = undefined;
         }
-
-        return {
-            x: postion.x - 0.5,
-            y: postion.y - 0.5
-        };
     }
 
     public render(ctx: CanvasRenderingContext2D) {
+        this.$observer.beginCollectDep();
+        ctx.save();
+        this.privateRender(ctx);
+        ctx.restore();
+        this.changed = false;
+        this.$observer.endCollectDep();
+
+    }
+
+    /**
+     * 图形的一些基本渲染处理, 主要包括对缓存的处理
+     * 子类不应该重写
+     * @param {CanvasRenderingContext2D} ctx
+     * @returns
+     * @memberof BaseView
+     */
+    private privateRender(ctx: CanvasRenderingContext2D) {
+        if (!this.rootCanvas || !this.data.visible || this.data.isEmpty) return null;
         if (!this.useCache) return this.draw(ctx);
-        if (!this.rootCanvas) return null;
-        const { x, y } = this.data.postion;
-        const { w, h } = this.data.size;
-        if (w === 0 || h === 0) return null;
-        if (!this._cacheContext) {
-            const canvas = document.createElement('canvas');
-            this._cacheContext = canvas.getContext('2d')!;
-            this._cacheContext.canvas.width = w + this.data.lineWidth * 2;
-            this._cacheContext.canvas.height = h + this.data.lineWidth * 2;
-            this._cacheContext.save();
-            this._cacheContext.translate(- x + this.data.lineWidth, - y + this.data.lineWidth);
-            this.draw(this._cacheContext);
-            this._cacheContext.restore();
+        const { x, y, w, h } = this.data.frame;
+        console.log('frame:', x, y, w, h);
+        const { left, top, bottom, right } = this.data.padding;
+        console.log('padding:', left, top, bottom, right);
+        if (this.cacheCanvasContext) {
+            if (this.changed) {
+                this.cacheCanvasContext.canvas.width = Math.abs(w) + left + right + 1;
+                this.cacheCanvasContext.canvas.height = Math.abs(h) + top + bottom + 1;
+                this.cacheCanvasContext.clearRect(0, 0, w, h);
+                this.cacheCanvasContext.save();
+                this.cacheCanvasContext.translate(Math.ceil(- x + left) + 1 - (w > 0 ? 0 : w), Math.ceil(-y + top) + 1 - (h > 0 ? 0 : h));
+                this.draw(this.cacheCanvasContext);
+                this.cacheCanvasContext.restore();
+            }
+            ctx.drawImage(this.cacheCanvasContext.canvas,
+                Math.ceil(x - left + (w > 0 ? 0 : w)) - 1,
+                Math.ceil(y - top + (h > 0 ? 0 : h)) - 1
+            );
+        } else {
+            this.draw(ctx);
         }
-
-        if (this.changed) {
-            this._cacheContext.clearRect(0, 0, this._cacheContext.canvas.width, this._cacheContext.canvas.height);
-            this._cacheContext.canvas.width = w + this.data.lineWidth * 2;
-            this._cacheContext.canvas.height = h + this.data.lineWidth * 2;
-            this._cacheContext.save();
-            this._cacheContext.translate(- x + this.data.lineWidth, - y + this.data.lineWidth);
-            this.draw(this._cacheContext);
-            this._cacheContext.restore();
-            this.changed = false;
-        }
-
-        ctx.drawImage(this._cacheContext.canvas, x - this.data.lineWidth, y - this.data.lineWidth);
     }
 }

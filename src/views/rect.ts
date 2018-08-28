@@ -1,22 +1,41 @@
-import RectModel from '../models/rect';
-import Base from './base';
-import Observer from '../decorators/obsever';
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-08-28 15:05:32
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-08-28 18:47:40
+ */
+import BaseView from './base';
+import ShapeModel from '../models/shape';
 
-@Observer
-export default class Rect extends Base {
 
-    public data: RectModel;
+ export default class BrushView extends BaseView {
+
+    public useCache = true;
+
+    public data: ShapeModel;
 
     constructor() {
         super();
-        this.data = new RectModel();
+        this.data = new ShapeModel();
     }
 
     public draw(ctx: CanvasRenderingContext2D) {
-        ctx.lineWidth = this.data.lineWidth || 27;
-        ctx.strokeStyle = 'rgb(1, 161, 255)';
-        ctx.lineCap = this.data.lineCap || 'normal';
         ctx.globalAlpha = this.data.opacity;
-        ctx.strokeRect(this.data.postion.x, this.data.postion.y, this.data.size.w, this.data.size.h);
+
+        const { x, y, w, h } = this.data.frame;
+
+        console.log(x, y, w, h);
+
+        if (this.data.lineWidth) {
+            ctx.lineWidth = this.data.lineWidth;
+            ctx.strokeStyle = this.data.strokeColor;
+            ctx.lineCap = this.data.lineCap;
+            ctx.lineJoin = this.data.lineJoin;
+            ctx.strokeRect(x, y, w, h);
+        }
+
+
+        ctx.fillStyle = this.data.fillColor;
+        ctx.fillRect(x, y, w, h);
     }
-}
+ }

@@ -1,40 +1,25 @@
-import { observable } from 'liob';
-import Base, { attr } from './base';
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-08-28 15:05:32
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-08-28 17:44:44
+ */
+import BrushModel from './brush';
 
-@observable
-export default class Line extends Base {
-    @attr
-    public pos: { x: number; y: number }[] = [];
 
-    get postion() {
-        const arrX = this.pos.map(p => p.x);
-        const arrY = this.pos.map(p => p.y);
-        const minX = Math.min(...arrX);
-        const minY = Math.min(...arrY);
+ export default class LineModel extends BrushModel {
 
-        return {
-            x: minX,
-            y: minY,
-        };
+
+    public static type = 'line';
+
+    public useCache = true;
+
+
+    get startPostion() {
+        return this.postions[0];
     }
 
-    set postion(value) {
-
+    get endPostion() {
+        return this.postions[1];
     }
-
-    get size() {
-        const arrX = this.pos.map(p => p.x);
-        const arrY = this.pos.map(p => p.y);
-        const minX = Math.min(...arrX);
-        const minY = Math.min(...arrY);
-
-        return {
-            w: Math.max(...arrX) - minX,
-            h: Math.max(...arrY) - minY,
-        };
-    }
-
-    set size(value) {
-        
-    }
-}
+ }

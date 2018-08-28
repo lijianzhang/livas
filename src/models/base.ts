@@ -1,36 +1,43 @@
-/*
- * @Author: lijianzhang
- * @Date: 2018-08-26 13:46:46
- * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-27 10:17:50
- */
 import 'reflect-metadata';
-
 import { IPostion, ISize } from '../types/postion';
 
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-08-28 14:18:55
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-08-28 18:25:49
+ */
 const attrsMetadataKey = Symbol('attrs');
 
-export function attr(target: any, key: string) {
+
+/**
+ * 标记属性字段
+ * @param target BaseView
+ * @param key 字段名
+ */
+export function attr<T extends BaseModel>(target: T, key: string) {
     const attrs = Reflect.getOwnMetadata(attrsMetadataKey, target) || [];
     attrs.push(key);
     Reflect.defineMetadata(attrsMetadataKey, attrs, target);
 }
 
+export default abstract class BaseModel {
 
-export default class BaseModel {
-
-    get attrNames() {
+    /**
+     * 获取数据字段数组
+     */
+    static get attrNames() {
         if (this._attrNames) return this._attrNames;
         const arr: string[] = [];
         let target: any = this;
         let stop = false;
         while (!stop) {
-            const data = Reflect.getMetadata(attrsMetadataKey, target);
+            const data = Reflect.getMetadata(attrsMetadataKey, target.prototype);
             arr.push(...data);
             if (target.constructor === BaseModel) {
                 stop = true;
             } else {
-                const nextTarget = target.__proto__.__proto__;
+                const nextTarget = target.__proto__;
                 if (!nextTarget || nextTarget === target) {
                     stop = true;
                 } else {
@@ -42,52 +49,28 @@ export default class BaseModel {
 
         return arr;
     }
-    /**
-     * 元素坐标
-     */
-    @attr
-    public postion: IPostion = { x: 0, y: 0 };
 
-    /**
-     * 元素尺寸
-     */
-    @attr
-    public size: ISize = { w: 0, h: 0 };
+    get isEmpty() {
+        return this.size.h === 0 || this.size.w === 0;
+    }
+
+    public static type: string;
+
+    private static _attrNames: string[];
+
+
+    get frame() {
+        return {
+            ...this.postion,
+            ...this.size
+        };
+    }
 
     /**
      * 元素锚点
      */
     @attr
     public  anchor: IPostion = { x: 0, y: 0 };
-
-    /**
-     * 线框颜色
-     */
-    @attr
-    public strokeColor = '#000';
-
-    /**
-     * 线框连接点形状
-     */
-    @attr
-    public lineCap: string = 'round';
-
-    @attr
-    public lineJoin: string = 'round';
-
-
-    /**
-     * 线宽
-     */
-    @attr
-    public lineWidth: number = 1;
-
-    /**
-     * 不透明度
-     */
-    @attr
-    public opacity: number = 1;
-
 
     /**
      * 是否冻结, 是否不可操作
@@ -101,15 +84,67 @@ export default class BaseModel {
     @attr
     public visible: boolean = true;
 
+    /**
+     * 元素定位
+     *
+     * @abstract
+     * @type {IPostion}
+     * @memberof BaseView
+     */
+    public abstract postion: IPostion;
+
+
+    public abstract padding: { top: number; left: number; right: number; bottom: number };
 
     /**
-     * 背景色
+     * 图形宽高
+     *
+     * @abstract
+     * @type {ISize}
+     * @memberof BaseView
      */
-    public backgroundColor: string = '';
+    public abstract size: ISize;
 
-    private _attrNames!: string[];
+    /**
+     * 线条颜色
+     *
+     * @type {string}
+     * @memberof BaseModel
+     */
+    public strokeColor: string = '#fff';
 
-    public set<T extends keyof this>(key: T, value: this[T]) {
-        this[key] = value;
-    }
+    /**
+     * 线宽
+     *
+     * @type {number}
+     * @memberof BaseModel
+     */
+    @attr
+    public lineWidth: number = 0;
+
+    /**
+     * 设置或返回线条末端线帽的样式
+     *
+     * @type {('butt' | 'round' | 'square')}
+     * @memberof BaseModel
+     */
+    @attr
+    public lineCap: 'butt' | 'round' | 'square' = 'round';
+
+    /**
+     * 属性设置或返回所创建边角的类型，当两条线交汇时。
+     *
+     * @type {('bevel' | 'round' | 'miter')}
+     * @memberof BaseModel
+     */
+    @attr
+    public lineJoin: 'bevel' | 'round' | 'miter' = 'round';
+
+    /**
+     *
+     * 不透明度
+     * @type {number}
+     * @memberof BaseView
+     */
+    public opacity: number = 1;
 }

@@ -23,6 +23,7 @@ export default class CachePool {
             return false;
         } else {
             const canvas = document.createElement('canvas');
+            document.body.appendChild(canvas);
             const ctx = canvas.getContext('2d')!;
             this.useCaches.push(ctx);
 

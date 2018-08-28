@@ -11,7 +11,7 @@ export default class Canvas {
 
     private el: HTMLElement;
 
-    private elms: View[] = [];
+    private elms: (View)[] = [];
 
     private gridding: Gridding;
 
@@ -40,13 +40,16 @@ export default class Canvas {
         this.forceUpdate();
     }
 
+    public removeView(el: View) {
+        const index = this.elms.findIndex(e => e === el);
+        this.elms.splice(index, 1);
+    }
+
     public draw = () => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         // this.gridding.render(this.context);
         this.elms.forEach(el => {
-            this.context.save();
             el.render(this.context);
-            this.context.restore();
         });
         this.willDraw = false;
     }

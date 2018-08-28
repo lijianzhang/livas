@@ -13,6 +13,7 @@
         "align": false,
         "variable-name": false,
         "insecure-random": false,
+        "no-redundant-jsdoc": false,
         "prefer-type-cast": false,
         "no-default-export": false,
         "no-shadowed-variable":false,

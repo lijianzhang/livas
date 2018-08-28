@@ -1,17 +1,24 @@
 import Base from './base';
-import BsaeModel from '../models/base';
-import Observer from '../decorators/obsever';
+import ShapeModel from '../models/shape';
 
-@Observer
+
 export default class Gridding extends Base {
 
-    public data = new BsaeModel();
+    public data = new ShapeModel();
+
+    public useCache = true;
+
+    constructor() {
+        super();
+        this.data.strokeColor = '#000';
+        this.data.lineWidth = 1;
+    }
 
     public draw(ctx: CanvasRenderingContext2D) {
         const stepX = 10;
         const stepY = 10;
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = this.data.strokeColor;
+        ctx.lineWidth = this.data.lineWidth;
 
         for (let i = stepX + 1.5; i < this.data.size.w; i += stepX) {
             ctx.moveTo(i, 0);
