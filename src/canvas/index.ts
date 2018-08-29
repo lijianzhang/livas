@@ -39,13 +39,19 @@ export default class Canvas {
         this.gridding.data.size = { w, h };
     }
 
-    public addMouseEventListener(type: MOUSE_EVENT, listener: (this: HTMLCanvasElement, ev: MouseEvent, pos: IPostion) => any, options?: boolean | AddEventListenerOptions) {
+    public addMouseEventListener(
+        type: MOUSE_EVENT,
+        listener: (this: HTMLCanvasElement, ev: MouseEvent, pos: IPostion) => any,
+        options?: boolean | AddEventListenerOptions
+    ) {
         const canvas = this.canvas;
         function handle(this: HTMLCanvasElement, e: MouseEvent) {
             const offset = getElementOffset(canvas);
-            return listener.call(this, e, { x: e.clientX - offset.left, y: e.clientY - offset.top });
+
+            listener.call(this, e, { x: e.clientX - offset.left, y: e.clientY - offset.top });
         }
         this.canvas.addEventListener(type, handle, options);
+
         return () => this.canvas.removeEventListener(type, handle);
     }
 
@@ -64,16 +70,11 @@ export default class Canvas {
 
     public draw = () => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        for (let index = 0; index < this.elms.length; index += 1) {
-            this.elms[index].render(this.context);
+        for (const el of this.elms) {
+            el.render(this.context);
         }
 
-        // this.gridding.render(this.context);
-        // this.elms.forEach(el => {
-        //     el.render(this.context);
-        // });
         this.willDraw = false;
-        // requestAnimationFrame(this.draw);
     }
 
     public forceUpdate() {
