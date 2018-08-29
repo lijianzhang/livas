@@ -3,7 +3,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 14:18:55
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-29 00:21:09
+ * @Last Modified time: 2018-08-29 11:21:17
  */
 
 import CachePool from '../utils/cache-pool';
@@ -110,12 +110,16 @@ export default abstract class BaseView {
     }
 
     public render(ctx: CanvasRenderingContext2D) {
-        this.$observer.beginCollectDep();
+        if (this.changed) {
+            this.$observer.beginCollectDep();
+        }
         ctx.save();
         this.privateRender(ctx);
         ctx.restore();
-        this.changed = false;
-        this.$observer.endCollectDep();
+        if (this.changed) {
+            this.$observer.endCollectDep();
+            this.changed = false;
+        }
 
     }
 

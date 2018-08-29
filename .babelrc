@@ -1,7 +1,11 @@
 {
     "presets": [["env", {
+        "modules": false,
+        "loose": true,
         "targets": {
-            "browsers": ["chrome 67"]
-        }
+            "chrome": "67"
+        },
+        "debug": true,
+        "useBuiltIns": true
     }]]
 }

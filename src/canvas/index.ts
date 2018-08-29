@@ -3,7 +3,7 @@ import View from '../views/base';
 import { getElementOffset } from '../utils/dom';
 import { IPostion } from '../types/postion';
 
-type MOUSE_EVENT = "mousedown" | "mouseenter" | "mouseleave" | "mousemove" | "mouseout" | "mouseover" | "mouseup";
+type MOUSE_EVENT = 'mousedown' | 'mouseenter' | 'mouseleave' | 'mousemove' | 'mouseout' | 'mouseover' | 'mouseup';
 
 export default class Canvas {
 
@@ -27,19 +27,19 @@ export default class Canvas {
         this.canvas.height = h * devicePixelRatio;
         this.canvas.width = w * devicePixelRatio;
 
-        
+
         this.context = this.canvas.getContext('2d')!;
-        
+
         this.context.scale(devicePixelRatio, devicePixelRatio);
-        
+
         this.el.appendChild(this.canvas);
-        
+
         this.gridding = new Gridding();
         this.gridding.rootCanvas = this;
         this.gridding.data.size = { w, h };
     }
 
-    addMouseEventListener(type: MOUSE_EVENT, listener: (this: HTMLCanvasElement, ev: MouseEvent, pos: IPostion) => any, options?: boolean | AddEventListenerOptions) {
+    public addMouseEventListener(type: MOUSE_EVENT, listener: (this: HTMLCanvasElement, ev: MouseEvent, pos: IPostion) => any, options?: boolean | AddEventListenerOptions) {
         const canvas = this.canvas;
         function handle(this: HTMLCanvasElement, e: MouseEvent) {
             const offset = getElementOffset(canvas);
@@ -64,10 +64,14 @@ export default class Canvas {
 
     public draw = () => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        for (let index = 0; index < this.elms.length; index += 1) {
+            this.elms[index].render(this.context);
+        }
+
         // this.gridding.render(this.context);
-        this.elms.forEach(el => {
-            el.render(this.context);
-        });
+        // this.elms.forEach(el => {
+        //     el.render(this.context);
+        // });
         this.willDraw = false;
         // requestAnimationFrame(this.draw);
     }
