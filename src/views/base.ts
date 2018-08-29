@@ -3,7 +3,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 14:18:55
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-29 11:21:17
+ * @Last Modified time: 2018-08-29 14:55:02
  */
 
 import CachePool from '../utils/cache-pool';
@@ -15,6 +15,8 @@ const cachePool = new CachePool(999);
 
 
 export default abstract class BaseView {
+
+    public static type: string;
 
     get data() {
         return this._data;
@@ -110,16 +112,16 @@ export default abstract class BaseView {
     }
 
     public render(ctx: CanvasRenderingContext2D) {
+        ctx.save();
         if (this.changed) {
             this.$observer.beginCollectDep();
-        }
-        ctx.save();
-        this.privateRender(ctx);
-        ctx.restore();
-        if (this.changed) {
+            this.privateRender(ctx);
             this.$observer.endCollectDep();
             this.changed = false;
+        } else {
+            this.privateRender(ctx);
         }
+        ctx.restore();
 
     }
 
@@ -133,7 +135,8 @@ export default abstract class BaseView {
     private privateRender(ctx: CanvasRenderingContext2D) {
         if (!this.rootCanvas || !this.data.visible || this.data.isEmpty) return null;
         if (!this.useCache) return this.draw(ctx);
-        const { x, y, w, h } = this.data.frame;
+        const { x, y } = this.data.postion;
+        const { w, h } = this.data.size;
         const { left, top, bottom, right } = this.data.padding;
         if (this.cacheCanvasContext) {
             if (this.changed) {

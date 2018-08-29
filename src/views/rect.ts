@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-28 22:52:21
+ * @Last Modified time: 2018-08-29 14:51:44
  */
 import BaseView from './base';
 import ShapeModel from '../models/shape';
@@ -22,7 +22,9 @@ import ShapeModel from '../models/shape';
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.globalAlpha = this.data.opacity;
 
-        const { x, y, w, h } = this.data.frame;
+        const { x, y } = this.data.postion;
+        const { w, h } = this.data.size;
+
 
         if (this.data.lineWidth && this.data.strokeColor) {
             ctx.lineWidth = this.data.lineWidth;
