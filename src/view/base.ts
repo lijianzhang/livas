@@ -1,40 +1,46 @@
 import 'reflect-metadata';
-import { IPostion, ISize } from '../types/postion';
+import { IPostion, ISize } from '../types';
+import { observable, Observer } from 'liob';
+
+export { computed } from 'liob';
 
 /*
  * @Author: lijianzhang
  * @Date: 2018-08-28 14:18:55
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-28 18:25:49
+ * @Last Modified time: 2018-09-02 02:29:09
  */
 const attrsMetadataKey = Symbol('attrs');
 
+let id = 0;
 
 /**
  * 标记属性字段
  * @param target BaseView
  * @param key 字段名
  */
-export function attr<T extends BaseModel>(target: T, key: string) {
+export function attr<T extends BaseView>(target: T, key: string, descriptor?: PropertyDescriptor) {
     const attrs = Reflect.getOwnMetadata(attrsMetadataKey, target) || [];
+    if (!descriptor) observable(target, key);
     attrs.push(key);
     Reflect.defineMetadata(attrsMetadataKey, attrs, target);
 }
 
-export default abstract class BaseModel {
+export default abstract class BaseView {
 
     /**
-     * 获取数据字段数组
+     * 获取与需要序列化的字段数组
      */
     static get attrNames() {
         if (this._attrNames) return this._attrNames;
         const arr: string[] = [];
-        let target: any = this;
+        let target: any = this.prototype;
         let stop = false;
+
         while (!stop) {
-            const data = Reflect.getMetadata(attrsMetadataKey, target.prototype);
+            const data = Reflect.getMetadata(attrsMetadataKey, target);
             arr.push(...data);
-            if (target.constructor === BaseModel) {
+            if (target.constructor === BaseView) {
                 stop = true;
             } else {
                 const nextTarget = target.__proto__;
@@ -50,21 +56,18 @@ export default abstract class BaseModel {
         return arr;
     }
 
+    get attrNames() {
+        return (this.constructor as typeof BaseView).attrNames;
+    }
+
     get isEmpty() {
         return this.size.h === 0 || this.size.w === 0;
     }
 
-    public static type: string;
-
     private static _attrNames: string[];
 
-
-    get frame() {
-        return {
-            ...this.postion,
-            ...this.size
-        };
-    }
+    @attr
+    public abstract type: string;
 
     /**
      * 元素锚点
@@ -94,7 +97,7 @@ export default abstract class BaseModel {
     public abstract postion: IPostion;
 
 
-    public abstract padding: { top: number; left: number; right: number; bottom: number };
+    public  padding?: { top: number; left: number; right: number; bottom: number };
 
     /**
      * 图形宽高
@@ -111,6 +114,7 @@ export default abstract class BaseModel {
      * @type {string}
      * @memberof BaseModel
      */
+    @attr
     public strokeColor: string = '#fff';
 
     /**
@@ -146,5 +150,42 @@ export default abstract class BaseModel {
      * @type {number}
      * @memberof BaseView
      */
+    @attr
     public opacity: number = 1;
+
+    public $observer: Observer;
+
+    public id: number;
+
+    constructor() {
+        id += 1;
+        this.id = id;
+        this.$observer = new Observer(() => {
+            this.forceUpdate();
+        }, `${this.constructor.name}.render()`);
+    }
+
+
+    public toJSON() {
+        const attrNames = this.attrNames;
+        const obj: any = {};
+        for (let index = 0; index < attrNames.length; index += 1) {
+            const value = this[attrNames[index]];
+            if (value !== undefined && value !== '' && value !== null) {
+                obj[attrNames[index]] = value;
+            }
+        }
+
+        return obj;
+    }
+
+    public toData() {
+        try {
+            return JSON.parse(JSON.stringify(this));
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public abstract forceUpdate(): void;
 }
