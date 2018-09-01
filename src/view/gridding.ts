@@ -1,4 +1,4 @@
-import Base from './base';
+import Base from './layer';
 
 
 export default class Gridding extends Base {

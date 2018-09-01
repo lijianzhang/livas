@@ -28,7 +28,6 @@ export default class GroupView extends LayerView {
     }
 
     protected draw(ctx: CanvasRenderingContext2D) {
-        console.log('draw group', this.id);
         for (let index = 0; index < this.subViews.length; index += 1) {
             this.subViews[index].render(ctx);
         }

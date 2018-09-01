@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 01:17:00
+ * @Last Modified time: 2018-09-02 03:37:25
  */
 import LayerView, { attr, computed } from './layer';
 import { IPostion } from '../types';
@@ -71,10 +71,6 @@ import { IPostion } from '../types';
         ctx.lineJoin = this.lineJoin;
         ctx.globalAlpha = this.opacity;
         ctx.beginPath();
-        if (this.parentView) {
-            const [x1, y1] = this.parentView.frame;
-            ctx.translate(x1, y1);
-        }
 
         let p1 = this.postions[0];
         let p2 = this.postions[1];

@@ -9,7 +9,7 @@ let line: BrushView = null;
 canvas.onMouseDown = (_, pos) => {
     line = new BrushView();
     canvas.addView(line);
-    line.lineWidth = 26;
+    line.lineWidth = 1;
     line.opacity = 0.8;
     line.strokeColor = '#ff5a5e';
     line.postions.push(pos);
@@ -82,7 +82,7 @@ canvas.onMouseUp = () => {
 
 const group = new GroupView();
 group.size = canvas.size;
-group.postion = canvas.postion;
+group.postion = { x: 50, y: 50 };
 const rect =  new RectView();
 rect.lineWidth = 2;
 rect.strokeColor = '#ff5a5e';
@@ -101,29 +101,40 @@ brush.postions = [{x: 20, y: 20}, { x: 50, y: 50 }];
 
 group.addView(brush);
 
-// group.onMouseDown = () => {
+group.onMouseDown = () => {
+    group.postion.x += 1;
+
+    return true;
+};
+
+
+
+// for (let index = 0; index < 100; index += 1) {
+//     const el = new RectView();
+//     el.lineWidth = 1;
+//     el.opacity = 1;
+//     el.strokeColor = '#ff5a5e';
+
+//     el.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * 504) };
+//     el.size = { w: Math.floor(Math.random() * 30), h: Math.floor(Math.random() * 30) };
+//     group.addView(el);
+// }
+
+// setInterval(() => {
 //     for (let index = 0; index < 100; index += 1) {
 //         group.subViews[index].postion.x += 1;
 //     }
+// }, 1);
 
-//     return false;
-// };
+// let time = 0;
 
+// function a() {
+//     if (time > 600) return;
+//     for (let index = 0; index < 100; index += 1) {
+//         group.subViews[index].postion.x += 1;
+//     }
+//     time += 1;
+//     requestAnimationFrame(a);
+// }
 
-
-for (let index = 0; index < 100; index += 1) {
-    const el = new RectView();
-    el.lineWidth = 1;
-    el.opacity = 1;
-    el.strokeColor = '#ff5a5e';
-
-    el.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * 504) };
-    el.size = { w: Math.floor(Math.random() * 30), h: Math.floor(Math.random() * 30) };
-    group.addView(el);
-}
-
-setInterval(() => {
-    for (let index = 0; index < 100; index += 1) {
-        group.subViews[index].postion.x += 1;
-    }
-}, 1);
+// requestAnimationFrame(a);

@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 01:01:03
+ * @Last Modified time: 2018-09-02 03:01:08
  */
 import LayerView, { attr } from './layer';
 import { IPostion, ISize } from '../types';
@@ -61,12 +61,12 @@ import { IPostion, ISize } from '../types';
             ctx.strokeStyle = this.strokeColor;
             ctx.lineCap = this.lineCap;
             ctx.lineJoin = this.lineJoin;
-            ctx.strokeRect(x, y, w, h);
+            ctx.strokeRect(0, 0, w, h);
         }
 
         if (this.backgroundColor) {
             ctx.fillStyle = this.backgroundColor;
-            ctx.fillRect(x, y, w, h);
+            ctx.fillRect(0, 0, w, h);
         }
 
     }

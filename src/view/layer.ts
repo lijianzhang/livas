@@ -140,22 +140,29 @@ export default abstract class Layer extends BaseView  {
      * @memberof BaseView
      */
     protected privateRender(ctx: CanvasRenderingContext2D) {
-        if (!this.cacheCanvasContext) return this.draw(ctx);
-        const [x, y, w, h] = this.frame;
+        const [x1, y1, w , h] = this.frame;
         const { left, top, bottom, right } = this.padding || { left: 0, right: 0, top: 0, bottom: 0 };
-        if (this._needForceUpdate) {
-            this.cacheCanvasContext.canvas.width = Math.abs(w) + left + right + 2;
-            this.cacheCanvasContext.canvas.height = Math.abs(h) + top + bottom + 2;
-            this.cacheCanvasContext.clearRect(0, 0, w, h);
-            this.cacheCanvasContext.save();
-            this.cacheCanvasContext.translate(Math.ceil(- x + left) + 1 - (w > 0 ? 0 : w), Math.ceil(-y + top) + 1 - (h > 0 ? 0 : h));
-            this.draw(this.cacheCanvasContext);
-            this.cacheCanvasContext.restore();
+        const { x , y } = this.postion;
+        if (!this.cacheCanvasContext) {
+            ctx.save();
+
+            ctx.translate(Math.ceil(x1 - x + (w > 0 ? 0 : w)), Math.ceil(y1 - y + (h > 0 ? 0 : h)));
+            this.draw(ctx);
+            ctx.restore();
+        } else {
+            if (this._needForceUpdate) {
+                this.cacheCanvasContext.canvas.width = Math.abs(w) + left + right + 2;
+                this.cacheCanvasContext.canvas.height = Math.abs(h) + top + bottom + 2;
+                this.cacheCanvasContext.save();
+                this.cacheCanvasContext.translate(Math.ceil(-x + left) + 1 - (w > 0 ? 0 : w), Math.ceil(-y + top) + 1 - (h > 0 ? 0 : h));
+                this.draw(this.cacheCanvasContext);
+                this.cacheCanvasContext.restore();
+            }
+            ctx.drawImage(this.cacheCanvasContext.canvas,
+                Math.ceil(x1 - left + (w > 0 ? 0 : w)) - 1,
+                Math.ceil(y1 - top + (h > 0 ? 0 : h)) - 1
+            );
         }
-        ctx.drawImage(this.cacheCanvasContext.canvas,
-            Math.ceil(x - left + (w > 0 ? 0 : w)) - 1,
-            Math.ceil(y - top + (h > 0 ? 0 : h)) - 1
-        );
         this._needForceUpdate = false;
     }
 }

@@ -109,9 +109,9 @@ export default class Canvas extends GroupView  {
 
     private getHandleEventView(e: MouseEvent, pos: IPostion, view: LayerView = this): LayerView {
         if (view.subViews) {
-            for (let index = this.subViews.length - 1; index >= 0; index -= 1) {
-                if (view.subViews[index].pointInside(pos)) {
-                    return this.getHandleEventView(e, pos, this.subViews[index]);
+            for (const v of view.subViews.reverse()) {
+                if (v.pointInside(pos)) {
+                    return this.getHandleEventView(e, pos, v);
                 }
             }
         }
