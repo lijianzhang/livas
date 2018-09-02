@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 03:01:08
+ * @Last Modified time: 2018-09-02 08:17:29
  */
 import LayerView, { attr } from './layer';
 import { IPostion, ISize } from '../types';
@@ -35,16 +35,6 @@ import { IPostion, ISize } from '../types';
         };
     }
 
-    /**
-     * 边框样式, 类似css
-     */
-    @attr
-    public border: { width: number;
-        style:  'solid' | 'dashed' ;
-        color: string;
-        radius: number;
-        } = { width: 0, style: 'solid', color: '', radius: 0 };
-
     public type = 'rect';
 
     public useCache = true;
@@ -53,25 +43,21 @@ import { IPostion, ISize } from '../types';
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.globalAlpha = this.opacity;
 
-        const [x, y, w, h] = this.frame;
+        const { w, h } = this.size;
+        const { x, y } = this.postion;
 
-
-        if (this.lineWidth && this.strokeColor) {
+        if (this.lineWidth && this.color) {
             ctx.lineWidth = this.lineWidth;
-            ctx.strokeStyle = this.strokeColor;
+            ctx.strokeStyle = this.color;
             ctx.lineCap = this.lineCap;
             ctx.lineJoin = this.lineJoin;
-            ctx.strokeRect(0, 0, w, h);
+            ctx.strokeRect(x, y, w, h);
         }
 
         if (this.backgroundColor) {
             ctx.fillStyle = this.backgroundColor;
-            ctx.fillRect(0, 0, w, h);
+            ctx.fillRect(x, y, w, h);
         }
 
-    }
-
-    public onMouseDown(e: MouseEvent, pos: IPostion) {
-        return false;
     }
  }

@@ -3,6 +3,12 @@ import Base from './layer';
 
 export default class Gridding extends Base {
 
+    constructor() {
+        super();
+        this.color = '#666';
+        this.lineWidth = 1;
+    }
+
     public postion = { x: 0, y: 0 };
 
     public size = { w: 0, h: 0 };
@@ -11,16 +17,10 @@ export default class Gridding extends Base {
 
     public useCache = true;
 
-    constructor() {
-        super();
-        this.strokeColor = '#000';
-        this.lineWidth = 1;
-    }
-
     public draw(ctx: CanvasRenderingContext2D) {
         const stepX = 10;
         const stepY = 10;
-        ctx.strokeStyle = this.strokeColor;
+        ctx.strokeStyle = this.color;
         ctx.lineWidth = this.lineWidth;
 
         for (let i = stepX + 1.5; i < this.size.w; i += stepX) {

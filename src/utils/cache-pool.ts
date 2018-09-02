@@ -4,6 +4,8 @@ export default class CachePool {
 
     public readonly useCaches: CanvasRenderingContext2D[] = [];
 
+    public readonly idCaches: {[k in string | number ]: CanvasRenderingContext2D} = {};
+
     public getCache() {
         const cache = this.freeCaches.pop();
         if (cache) {
@@ -17,6 +19,18 @@ export default class CachePool {
 
             return ctx;
         }
+    }
+
+    public getCacheWithId(id: string | number) {
+        let cache = this.idCaches[id];
+        if (cache) {
+            return cache;
+        } else {
+            cache = this.getCache();
+            this[id] = cache;
+        }
+
+        return cache;
     }
 
     public freeCache(cache: CanvasRenderingContext2D) {

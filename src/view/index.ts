@@ -6,4 +6,6 @@ export { default as GroupView  } from './group';
 export { default as BaseView  } from './base';
 export { default as LineView  } from './line';
 export { default as GriddingView  } from './gridding';
+export { default as SelectorView  } from './selector';
+export { default as CircleView  } from './circle';
 

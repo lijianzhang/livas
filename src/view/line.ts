@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 00:23:21
+ * @Last Modified time: 2018-09-02 07:53:00
  */
 import BrushView from './brush';
 import { IPostion } from '../types';
@@ -33,7 +33,7 @@ import { IPostion } from '../types';
 
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.lineWidth = this.lineWidth || 0.5;
-        ctx.strokeStyle = this.strokeColor;
+        ctx.strokeStyle = this.color;
         ctx.lineCap = this.lineCap;
         ctx.lineJoin = this.lineJoin;
         ctx.globalAlpha = this.opacity;

@@ -2,13 +2,13 @@ import 'reflect-metadata';
 import { IPostion, ISize } from '../types';
 import { observable, Observer } from 'liob';
 
-export { computed } from 'liob';
+export { computed, observable } from 'liob';
 
 /*
  * @Author: lijianzhang
  * @Date: 2018-08-28 14:18:55
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 02:29:09
+ * @Last Modified time: 2018-09-02 13:28:30
  */
 const attrsMetadataKey = Symbol('attrs');
 
@@ -56,16 +56,24 @@ export default abstract class BaseView {
         return arr;
     }
 
-    get attrNames() {
-        return (this.constructor as typeof BaseView).attrNames;
-    }
-
-    get isEmpty() {
-        return this.size.h === 0 || this.size.w === 0;
-    }
-
     private static _attrNames: string[];
 
+    constructor() {
+        id += 1;
+        this.id = id;
+        this.$observer = new Observer(() => {
+            this.forceUpdate();
+        }, `${this.constructor.name}.render()`);
+    }
+
+
+    /**
+     * view的类型, 需要根据不同type渲染不同的view
+     *
+     * @abstract
+     * @type {string}
+     * @memberof BaseView
+     */
     @attr
     public abstract type: string;
 
@@ -88,7 +96,7 @@ export default abstract class BaseView {
     public visible: boolean = true;
 
     /**
-     * 元素定位
+     * 元素定位, 这个定位是相对于父元素
      *
      * @abstract
      * @type {IPostion}
@@ -97,6 +105,12 @@ export default abstract class BaseView {
     public abstract postion: IPostion;
 
 
+    /**
+     * 元素的内边距
+     *
+     * @type {{ top: number; left: number; right: number; bottom: number }}
+     * @memberof BaseView
+     */
     public  padding?: { top: number; left: number; right: number; bottom: number };
 
     /**
@@ -115,7 +129,7 @@ export default abstract class BaseView {
      * @memberof BaseModel
      */
     @attr
-    public strokeColor: string = '#fff';
+    public color: string = '';
 
     /**
      * 线宽
@@ -157,13 +171,14 @@ export default abstract class BaseView {
 
     public id: number;
 
-    constructor() {
-        id += 1;
-        this.id = id;
-        this.$observer = new Observer(() => {
-            this.forceUpdate();
-        }, `${this.constructor.name}.render()`);
+    get attrNames() {
+        return (this.constructor as typeof BaseView).attrNames;
     }
+
+    get isEmpty() {
+        return this.size.h === 0 || this.size.w === 0;
+    }
+
 
 
     public toJSON() {

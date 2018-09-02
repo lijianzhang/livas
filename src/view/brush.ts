@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 03:37:25
+ * @Last Modified time: 2018-09-02 12:38:20
  */
 import LayerView, { attr, computed } from './layer';
 import { IPostion } from '../types';
@@ -46,16 +46,16 @@ import { IPostion } from '../types';
         };
     }
 
+    constructor() {
+        super();
+    }
+
     public useCache = true;
 
     public type = 'brush';
 
     @attr
     public postions: IPostion[] = [];
-
-    constructor() {
-        super();
-    }
 
     public midPointBtw(p1: IPostion, p2: IPostion) {
         return {
@@ -64,9 +64,29 @@ import { IPostion } from '../types';
         };
     }
 
+
+    // public pointInside(pos: IPostion) {
+    //     if (this.postions.length < 2) return false;
+
+    //     const diff = Math.max(2, this.lineWidth) / 2;
+    //     for (let index = 0; index < this.postions.length - 1; index += 1) {
+    //         const p1 = this.postions[index];
+    //         const p2 = this.postions[index + 1];
+    //         const [x1, x2] = p1.x > p2.x ? [p2.x, p1.x] : [p1.x, p2.x];
+    //         const [y1, y2] = p1.y > p2.y ? [p2.y, p1.y] : [p1.y, p2.y];
+    //         if (x1 - diff <= pos.x && pos.x <= x2 + diff && y1 - diff <= pos.y && pos.y <= y2 + diff) {
+
+    //             return true;
+    //         }
+
+    //     }
+
+    //     return false;
+    // }
+
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.lineWidth = this.lineWidth || 0.5;
-        ctx.strokeStyle = this.strokeColor;
+        ctx.strokeStyle = this.color;
         ctx.lineCap = this.lineCap;
         ctx.lineJoin = this.lineJoin;
         ctx.globalAlpha = this.opacity;
@@ -84,28 +104,5 @@ import { IPostion } from '../types';
             p2 = this.postions[index + 1];
         }
         ctx.stroke();
-    }
-
-    public pointInside(pos: IPostion) {
-        if (this.postions.length < 2) return false;
-
-        const diff = Math.max(10, this.lineWidth) / 2;
-        for (let index = 0; index < this.postions.length - 1; index += 1) {
-            const p1 = this.postions[index];
-            const p2 = this.postions[index + 1];
-            const [x1, x2] = p1.x > p2.x ? [p2.x, p1.x] : [p1.x, p2.x];
-            const [y1, y2] = p1.y > p2.y ? [p2.y, p1.y] : [p1.y, p2.y];
-            if (x1 - diff <= pos.x && pos.x <= x2 + diff && y1 - diff <= pos.y && pos.y <= y2 + diff) {
-
-                return true;
-            }
-
-        }
-
-        return false;
-    }
-
-    public onMouseDown(e: MouseEvent, pos: IPostion) {
-        return false;
     }
  }

@@ -10,6 +10,25 @@
         "indent": [true, "spaces", 4],
         "interface-name": false,
         "export-name": false,
+        "member-ordering": [true, {
+            "order": [
+                "public-static-field",
+                "public-static-method",
+                "protected-static-field",
+                "protected-static-method",
+                "private-static-field",
+                "private-static-method",
+                "public-constructor",
+                "protected-constructor",
+                "private-constructor",
+                "public-instance-field",
+                "protected-instance-field",
+                "private-instance-field",
+                "public-instance-method",
+                "protected-instance-method",
+                "private-instance-method"
+            ]
+          }],
         "align": false,
         "variable-name": false,
         "insecure-random": false,
