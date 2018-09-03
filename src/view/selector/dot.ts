@@ -1,7 +1,7 @@
 import LayerView, { attr } from '../layer';
 import SelectorView from './index';
 import globalStore from '../../store/global';
-import { IPostion } from '../../types';
+import { IEventObj } from '../../utils/event';
 
 type Direction = 'left' | 'top' | 'bottom' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
@@ -53,56 +53,35 @@ export default class Point extends LayerView {
 
     public useCache = true;
 
-    private isDrag = false;
-
-    public onMouseDown() {
-        this.isDrag = true;
-        this.background = '#ff5a5e';
-        globalStore.context.canvas.style.cursor = 's-resize';
-        globalStore.context.canvas.addEventListener('mousemove', this.changePostion);
-
-        return false;
-    }
-
-    public changePostion = (e: MouseEvent) => {
-        if (!this.isDrag) return;
-        this.selectorView.postion = {
-            x: e.offsetX - this.selectorView.frame[0] + this.selectorView.postion.x,
-            y: e.offsetY - this.selectorView.frame[1] + this.selectorView.postion.y
-        };
-    }
-
-    // public onMouseMove(_, pos: IPostion) {
-    //     if (this.isDrag) {
-    //         console.log(pos, this.selectorView.frame[0], this.selectorView.frame[1], this.selectorView.postion);
-    //         const x = pos.x - this.selectorView.frame[0] + this.selectorView.postion.x;
-    //         const y = pos.y - this.selectorView.frame[1] + this.selectorView.postion.y;
-
-    //         this.selectorView.postion = { x, y };
-    //     }
+    // public onMouseDown() {
+    //     this.isDrag = true;
+    //     this.background = '#ff5a5e';
+    //     globalStore.context.canvas.style.cursor = 's-resize';
+    //     globalStore.context.canvas.addEventListener('mousemove', this.changePostion);
 
     //     return false;
     // }
 
-    public onMouseUp() {
-        console.log('onMouseUp');
-        this.isDrag = false;
-        globalStore.context.canvas.removeEventListener('mousemove', this.changePostion);
-
-        return false;
+    public onMouseDrag(e: IEventObj) {
+        // this.selectorView.postion = {
+        //     x: e.pos - this.selectorView.frame[0] + this.selectorView.postion.x,
+        //     y: e.offsetY - this.selectorView.frame[1] + this.selectorView.postion.y
+        // };
+        this.selectorView.postion = {
+            x: e.pos.x,
+            y: e.pos.y
+        };
     }
+
 
     public onMouseEnter() {
         this.background = '#ff5a5e';
-
-        return true;
+        globalStore.context.canvas.style.cursor = 's-resize';
     }
 
     public onMouseLeave() {
         this.background = '#666';
         globalStore.context.canvas.style.cursor = 'default';
-
-        return true;
     }
 
     public draw(ctx: CanvasRenderingContext2D) {
@@ -130,6 +109,5 @@ export default class Point extends LayerView {
                 Math.PI * 2
             );
             ctx.fill();
-        }
     }
 }

@@ -22,11 +22,12 @@ export default class Selector extends GroupView {
     public type = 'tool: selector';
 
     get currentView() {
-        if (globalStore.currentViews) {
-            return globalStore.currentViews[globalStore.currentViews.length - 1];
-        }
+        return globalStore.currentView;
+        // if (globalStore.currentView) {
+        //     return globalStore.currentViews[globalStore.currentViews.length - 1];
+        // }
 
-        return null;
+        // return null;
     }
 
     public zIndex = 999999999999;

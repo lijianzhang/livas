@@ -2,13 +2,13 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 21:43:06
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-28 22:01:04
+ * @Last Modified time: 2018-09-03 21:00:17
 */
 
 export function getElementOffset(element: HTMLElement) {
     const offset = {
         top: element.offsetTop,
-        left: element.offsetLeft,
+        left: element.offsetLeft
     };
     let parent = element.offsetParent as HTMLElement;
 

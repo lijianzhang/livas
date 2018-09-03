@@ -3,13 +3,14 @@ import CachePool from '../utils/cache-pool';
 import { IPostion } from '../types';
 export { attr, computed } from './base';
 import globalStore from '../store/global';
+import { IViewEvent, IEventObj } from '../utils/event';
 
 // type MOUSE_EVENT = 'mousedown' | 'mouseenter' | 'mouseleave' | 'mousemove' | 'mouseout' | 'mouseover' | 'mouseup';
 
 const cachePool = new CachePool();
 
 
-export default abstract class Layer extends BaseView  {
+export default abstract class Layer extends BaseView implements IViewEvent {
 
     /**
      * 权重越高越上面
@@ -19,8 +20,8 @@ export default abstract class Layer extends BaseView  {
      */
     @attr
     get zIndex() {
-        if (globalStore.currentViews && globalStore.currentViews.find(f => f === this)) {
-            return 999999999;
+        if (globalStore.currentView && globalStore.currentView === this) {
+            return Number.MAX_VALUE - 100; // 保证在一些工具图形的下层
         }
 
         return this._zIndex;
@@ -88,7 +89,6 @@ export default abstract class Layer extends BaseView  {
      * @type {Layer[]}
      * @memberof Layer
      */
-    @attr
     public subViews?: Layer[];
 
     /**
@@ -133,8 +133,6 @@ export default abstract class Layer extends BaseView  {
      */
     private _cacheCanvasContext?: CanvasRenderingContext2D;
 
-    private __timer?: number;
-
     /**
      * 判断点是否在该view上
      *
@@ -144,32 +142,8 @@ export default abstract class Layer extends BaseView  {
      */
     public pointInside(pos: IPostion) {
         if (this.x <= pos.x && pos.x <= this.x + this.size.w && this.y <= pos.y && pos.y <= this.y + this.size.h) {
-            if (this.mouseStatus === 'onMouseLeave') {
-                this.mouseStatus = 'onMouseEnter';
-                if (this.onMouseEnter) {
-                    this.onMouseEnter(globalStore.mouseEvent!.e, globalStore.mouseEvent!.pos);
-                }
-            } else {
-                this.mouseStatus = 'onMouseMove';
-            }
-
-            if (this.onMouseLeave) {
-                clearTimeout(this.__timer);
-                this.__timer = setTimeout(() => {
-                    this.pointInside(globalStore.mouseEvent!.pos);
-                }, 5);
-            }
-
             return true;
         }
-
-        if (this.mouseStatus !== 'onMouseLeave') {
-            this.mouseStatus = 'onMouseLeave';
-            if (this.onMouseLeave) {
-                this.onMouseLeave();
-            }
-        }
-
 
         return false;
     }
@@ -216,15 +190,17 @@ export default abstract class Layer extends BaseView  {
 
 
 
-    public onMouseDown?(e: MouseEvent, pos: IPostion): boolean;
+    public onMouseDown?(e: IEventObj): boolean;
 
-    public onMouseMove?(e: MouseEvent, pos: IPostion): boolean;
+    public onMouseMove?(e: IEventObj);
 
-    public onMouseUp?(e: MouseEvent, pos: IPostion): boolean;
+    public onMouseUp?(e: IEventObj): boolean;
 
-    public onMouseEnter?(e: MouseEvent, pos: IPostion): boolean;
+    public onMouseEnter?(e: IEventObj);
 
-    public onMouseLeave?(): boolean;
+    public onMouseDrag?(e: IEventObj);
+
+    public onMouseLeave?();
 
 
     /**

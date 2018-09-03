@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 08:17:29
+ * @Last Modified time: 2018-09-03 21:05:27
  */
 import LayerView, { attr } from './layer';
 import { IPostion, ISize } from '../types';
@@ -41,6 +41,7 @@ import { IPostion, ISize } from '../types';
 
 
     public draw(ctx: CanvasRenderingContext2D) {
+        console.log(this.postion);
         ctx.globalAlpha = this.opacity;
 
         const { w, h } = this.size;
