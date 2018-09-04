@@ -292,7 +292,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
 
                 if (w < 0 || h < 0) {
                     this.cacheCanvasContext.scale(w < 0 ? -1 : 1, h < 0 ? -1 : 1);
-                    // this.cacheCanvasContext.translate(w < 0 ? (-w / 2) : 0, h < 0 ? -h / 2 : 0);
+                    this.cacheCanvasContext.translate(w < 0 ? w : 0, h < 0 ? h : 0);
                 }
 
                 this.cacheCanvasContext.translate(
@@ -305,7 +305,6 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                 this.cacheCanvasContext.setTransform(1, 0, 0, 1, 0, 0);
                 this.cacheCanvasContext.restore();
             }
-            console.log(this.type, x, y, w, h);
             ctx.drawImage(this.cacheCanvasContext.canvas,
                 Math.ceil(x - left - 1),
                 Math.ceil(y - top - 1)

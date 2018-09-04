@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-04 21:28:50
+ * @Last Modified time: 2018-09-04 21:53:21
  */
 import LayerView, { attr } from './layer';
 import { IPostion, ISize } from '../types';
@@ -43,7 +43,7 @@ import { IPostion, ISize } from '../types';
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.globalAlpha = this.opacity;
 
-        const { w, h } = this.size;
+        const [, , w, h] = this.frame;
 
         if (this.lineWidth && this.color) {
             ctx.lineWidth = this.lineWidth;

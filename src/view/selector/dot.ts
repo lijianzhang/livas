@@ -66,6 +66,7 @@ export default class Point extends LayerView {
         this.background = '#666';
         globalStore.context.canvas.style.cursor = 'default';
 
+
         switch (this.direction) {
             case 'nw': {
                 const diffX = e.pos.x - e.prePos.x;
