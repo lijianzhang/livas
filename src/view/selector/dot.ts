@@ -146,7 +146,6 @@ export default class Point extends LayerView {
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.globalAlpha = this.opacity;
 
-        const { x, y } = this.postion;
         ctx.shadowColor = 'rgba(0,0,0,.15)';
         ctx.shadowOffsetX = 3;
         ctx.shadowOffsetY = 1;
@@ -155,14 +154,14 @@ export default class Point extends LayerView {
 
             ctx.fillStyle = this.color;
             ctx.beginPath();
-            ctx.arc(x, y, this.r, 0, Math.PI * 2);
+            ctx.arc(0, 0, this.r, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = this.background;
             ctx.beginPath();
             ctx.arc(
-                x,
-                y,
+                0,
+                0,
                 this.r - 2,
                 0,
                 Math.PI * 2

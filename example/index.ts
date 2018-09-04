@@ -132,10 +132,10 @@ for (let index = 0; index < 5; index += 1) {
     el.lineWidth = Math.floor(Math.random() * 5);
     el.opacity = 1;
 
-    const grd = canvas.context.createLinearGradient(0, 0, 170, 0);
+    const grd = canvas.context.createLinearGradient(20, 100, 170, 0);
     grd.addColorStop(0, getRandomColor());
     grd.addColorStop(1, 'white');
-    // Math.random() > 0.5 ? el.color = getRandomColor() : el.backgroundColor = getRandomColor();
+    Math.random() > 0.5 ? el.color = getRandomColor() : el.backgroundColor = getRandomColor();
     el.backgroundColor = grd;
     el.color = getRandomColor();
     el.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * innerHeight) };

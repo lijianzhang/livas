@@ -14,7 +14,6 @@ export default class Selector extends GroupView {
         let [x, y] = [0, 0];
         if (this.currentView) {
             [x , y] = [this.currentView.x, this.currentView.y];
-            const { w, h } = this.currentView.size;
             x -= 8;
             y -= 8;
             // x -= w < 0 ? 8 : 8;
@@ -34,8 +33,8 @@ export default class Selector extends GroupView {
         let [w , h] = [0, 0];
         if (this.currentView) {
             [, , w, h] = this.currentView.frame;
-            w -= w < 0 ? 16 : -16;
-            h -= h < 0 ? 16 : -16;
+            w += 16;
+            h += 16;
         }
 
         return { w, h };
@@ -77,12 +76,11 @@ export default class Selector extends GroupView {
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
-        const [x, y, w, h] = this.frame;
-
-        ctx.strokeRect(x + 8, y + 8, w - 16, h - 16);
+        const [, , w, h] = this.frame;
+        ctx.strokeRect(8, 8, w - 16, h - 16);
         ctx.setLineDash([4, 4]);
         ctx.strokeStyle = '#000';
-        ctx.strokeRect(x + 8, y + 8, w - 16, h - 16);
+        ctx.strokeRect(8, 8, w - 16, h - 16);
         super.draw(ctx);
     }
 }

@@ -1,6 +1,18 @@
 import LayerView, { attr, computed } from './layer';
 export default class GroupView extends LayerView {
 
+    @computed
+    get sortSubViews() {
+        return [...this.subViews].sort((a, b) => {
+            return a.zIndex - b.zIndex;
+        });
+    }
+
+    constructor() {
+        super();
+        this.anchor = [0, 0];
+    }
+
     public type = 'group';
 
     public subViews: LayerView[] = [];
@@ -12,13 +24,6 @@ export default class GroupView extends LayerView {
     public size = { w: 0, h: 0 };
 
     public useCache = true;
-
-    @computed
-    get sortSubViews() {
-        return [...this.subViews].sort((a, b) => {
-            return a.zIndex - b.zIndex;
-        });
-    }
 
     public removeView<T extends LayerView>(el: T) {
         const index = this.subViews.findIndex(e => e === el);

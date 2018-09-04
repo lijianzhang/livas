@@ -29,7 +29,9 @@ export default class Canvas extends GroupView  {
         this.addView(this.selector);
         globalStore.context = this.context;
         this.forceUpdate();
+        this.anchor = [0, 0];
     }
+
 
     public canvas: HTMLCanvasElement;
 

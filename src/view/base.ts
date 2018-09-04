@@ -81,13 +81,19 @@ export default abstract class BaseView {
      * 元素锚点
      */
     @attr
-    public  anchor: IPostion = { x: 0, y: 0 };
+    public  anchor: [number, number] = [0.5, 0.5];
 
     /**
      * 是否冻结, 是否不可操作
      */
     @attr
     public frozen: boolean = false;
+
+    /**
+     * 缩放比例
+     */
+    @attr
+    public scale: [number, number] = [1, 1];
 
     /**
      * 是否可见
