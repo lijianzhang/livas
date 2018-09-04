@@ -52,7 +52,19 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      * @memberof Layer
      */
     get frame() {
-        return [this.x, this.y, this.size.w, this.size.h];
+        let {x, y} = this.postion;
+        let { w, h } = this.size;
+        if (w < 0) {
+            x += this.size.w;
+            w = -w;
+        }
+
+        if (h < 0) {
+            y += this.size.h;
+            h = -h;
+        }
+
+        return [x, y, w, h];
     }
 
     /**
@@ -62,11 +74,16 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      * @memberof Layer
      */
     get x() {
-        if (this.parentView) {
-            return this.postion.x + this.parentView.x;
+        let x = this.postion.x;
+        if (this.size.w < 0) {
+            x += this.size.w;
         }
 
-        return this.postion.x;
+        if (this.parentView) {
+            return x + this.parentView.x;
+        }
+
+        return x;
     }
 
     /**
@@ -76,11 +93,16 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      * @memberof Layer
      */
     get y() {
-        if (this.parentView) {
-            return this.postion.y + this.parentView.y;
+        let y = this.postion.y;
+        if (this.size.h < 0) {
+            y += this.size.h;
         }
 
-        return this.postion.y;
+        if (this.parentView) {
+            return y + this.parentView.y;
+        }
+
+        return y;
     }
 
     /**
@@ -141,7 +163,24 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      * @memberof BaseView
      */
     public pointInside(pos: IPostion) {
-        if (this.x <= pos.x && pos.x <= this.x + this.size.w && this.y <= pos.y && pos.y <= this.y + this.size.h) {
+        // let minX = this.x;
+        // let maxX = this.x + this.size.w;
+
+        // if (this.size.w < 0) {
+        //     [minX, maxX] = [maxX, minX];
+        // }
+
+        // let minY = this.y;
+        // let maxY = this.y + this.size.h;
+        // if (this.size.h < 0) {
+        //     [minY, maxY] = [maxY, minY];
+        // }
+
+        const p = this.getPointWithView(pos, this);
+
+        const [x, y, w, h] = this.frame;
+
+        if (x <= p.x && p.x <= x + w && y <= p.y && p.y <= y + h) {
             return true;
         }
 
@@ -235,9 +274,12 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      * @memberof BaseView
      */
     protected privateRender(ctx: CanvasRenderingContext2D) {
-        const [x1, y1, w , h] = this.frame;
+        // const [x1, y1, w , h] = this.frame;
         const { left, top, bottom, right } = this.padding || { left: 0, right: 0, top: 0, bottom: 0 };
-        const { x , y } = this.postion;
+        const [x , y, w, h ] = this.frame;
+
+        const [x1, y1] = [this.x, this.y];
+
         if (!this.cacheCanvasContext) {
             ctx.save();
             ctx.translate(Math.ceil(x1 - x + (w > 0 ? 0 : w)), Math.ceil(y1 - y + (h > 0 ? 0 : h)));
@@ -248,6 +290,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                 this.cacheCanvasContext.canvas.width = Math.abs(w) + left + right + 2;
                 this.cacheCanvasContext.canvas.height = Math.abs(h) + top + bottom + 2;
                 this.cacheCanvasContext.save();
+
                 this.cacheCanvasContext.translate(Math.ceil(-x + left) + 1 - (w > 0 ? 0 : w), Math.ceil(-y + top) + 1 - (h > 0 ? 0 : h));
                 this.draw(this.cacheCanvasContext);
                 this.cacheCanvasContext.restore();

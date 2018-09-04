@@ -63,12 +63,64 @@ export default class Point extends LayerView {
     // }
 
     public onMouseDrag(e: IEventObj) {
-        switch (this.direction) {
-            case 'nw':
-                 const point = this.getPointWithView(e.pos, this.selectorView.currentView);
-                this.selectorView.postion = point;
-                break;
+        this.background = '#666';
+        globalStore.context.canvas.style.cursor = 'default';
 
+        switch (this.direction) {
+            case 'nw': {
+                const diffX = e.pos.x - e.prePos.x;
+                const diffY = e.pos.y - e.prePos.y;
+                this.selectorView.currentView!.postion.x += diffX;
+                this.selectorView.currentView!.postion.y += diffY;
+                this.selectorView.currentView!.size.w -= diffX;
+                this.selectorView.currentView!.size.h -= diffY;
+                break;
+            }
+            case 'n': {
+                const diffY = e.pos.y - e.prePos.y;
+                this.selectorView.currentView!.postion.y += diffY;
+                this.selectorView.currentView!.size.h -= diffY;
+                break;
+            }
+            case 'ne': {
+                const diffX = e.pos.x - e.prePos.x;
+                const diffY = e.pos.y - e.prePos.y;
+                this.selectorView.currentView!.postion.y += diffY;
+                this.selectorView.currentView!.size.w += diffX;
+                this.selectorView.currentView!.size.h -= diffY;
+                break;
+            }
+            case 'w': {
+                const diffX = e.pos.x - e.prePos.x;
+                this.selectorView.currentView!.postion.x += diffX;
+                this.selectorView.currentView!.size.w -= diffX;
+                break;
+            }
+            case 'e': {
+                const diffX = e.pos.x - e.prePos.x;
+                this.selectorView.currentView!.size.w += diffX;
+                break;
+            }
+            case 'sw': {
+                const diffX = e.pos.x - e.prePos.x;
+                const diffY = e.pos.y - e.prePos.y;
+                this.selectorView.currentView!.postion.x += diffX;
+                this.selectorView.currentView!.size.w -= diffX;
+                this.selectorView.currentView!.size.h += diffY;
+                break;
+            }
+            case 'se': {
+                const diffX = e.pos.x - e.prePos.x;
+                const diffY = e.pos.y - e.prePos.y;
+                this.selectorView.currentView!.size.w += diffX;
+                this.selectorView.currentView!.size.h += diffY;
+                break;
+            }
+            case 's': {
+                const diffY = e.pos.y - e.prePos.y;
+                this.selectorView.currentView!.size.h += diffY;
+                break;
+            }
             default:
         }
     }
@@ -77,6 +129,13 @@ export default class Point extends LayerView {
     public onMouseEnter() {
         this.background = '#ff5a5e';
         globalStore.context.canvas.style.cursor = `${this.direction}-resize`;
+    }
+
+    public onMouseUp() {
+        this.background = '#666';
+        globalStore.context.canvas.style.cursor = 'default';
+
+        return true;
     }
 
     public onMouseLeave() {

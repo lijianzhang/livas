@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 12:38:20
+ * @Last Modified time: 2018-09-04 11:40:29
  */
 import LayerView, { attr, computed } from './layer';
 import { IPostion } from '../types';

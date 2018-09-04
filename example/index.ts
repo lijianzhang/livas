@@ -91,7 +91,7 @@ gridding.size = { w: innerWidth, h: innerHeight };
 
 const group = new GroupView();
 group.size = canvas.size;
-group.postion = { x: 50, y: 50 };
+// group.postion = { x: 50, y: 50 };
 const rect =  new RectView();
 rect.lineWidth = 2;
 rect.postion = { x: 20, y: 20 };
@@ -132,8 +132,12 @@ for (let index = 0; index < 5; index += 1) {
     el.lineWidth = Math.floor(Math.random() * 5);
     el.opacity = 1;
 
-    Math.random() > 0.5 ? el.color = getRandomColor() : el.backgroundColor = getRandomColor();
-
+    const grd = canvas.context.createLinearGradient(0, 0, 170, 0);
+    grd.addColorStop(0, getRandomColor());
+    grd.addColorStop(1, 'white');
+    // Math.random() > 0.5 ? el.color = getRandomColor() : el.backgroundColor = getRandomColor();
+    el.backgroundColor = grd;
+    el.color = getRandomColor();
     el.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * innerHeight) };
     el.size = { w: 400, h: 400 };
     group.addView(el);
