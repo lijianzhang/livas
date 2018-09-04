@@ -8,7 +8,7 @@ export { computed, observable } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-08-28 14:18:55
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-02 13:28:30
+ * @Last Modified time: 2018-09-04 23:08:04
  */
 const attrsMetadataKey = Symbol('attrs');
 
@@ -94,6 +94,15 @@ export default abstract class BaseView {
      */
     @attr
     public scale: [number, number] = [1, 1];
+
+    @attr
+    public skew: [number, number] = [0, 0];
+
+    @attr
+    public rotate: number = 0;
+
+    @attr
+    public translate: [number, number] = [0, 0];
 
     /**
      * 是否可见

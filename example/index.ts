@@ -138,6 +138,7 @@ for (let index = 0; index < 5; index += 1) {
     Math.random() > 0.5 ? el.color = getRandomColor() : el.backgroundColor = getRandomColor();
     el.backgroundColor = grd;
     el.color = getRandomColor();
+    el.rotate = Math.ceil(Math.random() * 180);
     el.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * innerHeight) };
     el.size = { w: 400, h: 400 };
     group.addView(el);

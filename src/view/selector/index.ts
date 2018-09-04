@@ -46,6 +46,20 @@ export default class Selector extends GroupView {
         }
     }
 
+    get rotate() {
+        if (this.currentView) {
+            return this.currentView.rotate;
+        }
+
+        return 0;
+    }
+
+    set rotate(value) {
+        if (this.currentView) {
+            this.currentView.rotate = value;
+        }
+    }
+
     constructor() {
         super();
         (window as any).b = this;
@@ -74,6 +88,7 @@ export default class Selector extends GroupView {
     }
 
     public draw(ctx: CanvasRenderingContext2D) {
+        console.log(this.frame, this.currentView!.size);
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
         const [, , w, h] = this.frame;

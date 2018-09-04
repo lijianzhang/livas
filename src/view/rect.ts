@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-28 15:05:32
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-04 21:53:21
+ * @Last Modified time: 2018-09-04 22:26:28
  */
 import LayerView, { attr } from './layer';
 import { IPostion, ISize } from '../types';

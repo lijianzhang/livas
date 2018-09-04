@@ -285,9 +285,13 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             this.draw(ctx);
             ctx.restore();
         } else {
+            const angle = this.rotate * Math.PI / 180;
+            const width = Math.ceil((Math.abs(w * Math.cos(angle) + h * Math.sin(angle)) + left + right + 2) * this.scale[0]);
+            const hegiht = Math.ceil((Math.abs(h * Math.cos(angle) + w * Math.sin(angle)) + top + bottom + 2) * this.scale[1]);
             if (this._needForceUpdate) {
-                this.cacheCanvasContext.canvas.width = Math.abs(w) + left + right + 2;
-                this.cacheCanvasContext.canvas.height = Math.abs(h) + top + bottom + 2;
+                console.log(width, hegiht, w, h);
+                this.cacheCanvasContext.canvas.width = width;
+                this.cacheCanvasContext.canvas.height = hegiht;
                 this.cacheCanvasContext.save();
 
                 if (w < 0 || h < 0) {
@@ -295,20 +299,30 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                     this.cacheCanvasContext.translate(w < 0 ? w : 0, h < 0 ? h : 0);
                 }
 
-                this.cacheCanvasContext.translate(
-                    left + 1,
-                    top + 1
+                this.cacheCanvasContext.transform(
+                    this.scale[0],
+                    this.skew[0],
+                    this.skew[1],
+                    this.scale[1],
+                    (left + 1) + Math.abs(w) * Math.sin(angle),
+                    (top + 1)
                 );
+                this.cacheCanvasContext.rotate(angle);
 
 
                 this.draw(this.cacheCanvasContext);
                 this.cacheCanvasContext.setTransform(1, 0, 0, 1, 0, 0);
                 this.cacheCanvasContext.restore();
             }
+
             ctx.drawImage(this.cacheCanvasContext.canvas,
                 Math.ceil(x - left - 1),
-                Math.ceil(y - top - 1)
+                Math.ceil(y - top - 1),
+                width,
+                hegiht
             );
+
+            ctx.setTransform(1, 0 , 0, 1, 0, 0);
         }
         this._needForceUpdate = false;
     }
