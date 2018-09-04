@@ -1,7 +1,7 @@
 import { CanvasView, BrushView, RectView, GroupView, GriddingView } from '../src';
 import { store } from 'liob';
 
-store.useLog();
+// store.useLog();
 const canvas = new CanvasView(document.getElementById('canvas'), innerWidth, innerHeight);
 
 canvas.canvas.style.border = '1px solid #000';

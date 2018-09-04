@@ -2,24 +2,9 @@ import GroupView from '../group';
 import DotView from './dot';
 import globalStore from '../../store/global';
 import { IPostion, ISize } from '../../types';
+import { IEventObj } from '../../utils/event';
 
 export default class Selector extends GroupView {
-
-    constructor() {
-        super();
-        (window as any).b = this;
-        const dotView1 = new DotView(this, 'left');
-        const dotView2 = new DotView(this, 'right');
-        const dotView3 = new DotView(this, 'bottom');
-        const dotView4 = new DotView(this, 'top');
-        const dotView5 = new DotView(this, 'top-left');
-        const dotView6 = new DotView(this, 'top-right');
-        const dotView7 = new DotView(this, 'bottom-left');
-        const dotView8 = new DotView(this, 'bottom-right');
-        this.addViews([dotView1, dotView2, dotView3, dotView4, dotView5, dotView6, dotView7, dotView8]);
-    }
-
-    public type = 'tool: selector';
 
     get currentView() {
         return globalStore.currentView;
@@ -29,8 +14,6 @@ export default class Selector extends GroupView {
 
         // return null;
     }
-
-    public zIndex = 999999999999;
 
     get postion() {
         let [x, y] = [0, 0];
@@ -74,7 +57,32 @@ export default class Selector extends GroupView {
         }
     }
 
+    constructor() {
+        super();
+        (window as any).b = this;
+        const dotView1 = new DotView(this, 'n');
+        const dotView2 = new DotView(this, 'nw');
+        const dotView3 = new DotView(this, 'ne');
+        const dotView4 = new DotView(this, 'w');
+        const dotView5 = new DotView(this, 'e');
+        const dotView6 = new DotView(this, 's');
+        const dotView7 = new DotView(this, 'sw');
+        const dotView8 = new DotView(this, 'se');
+        this.addViews([dotView1, dotView2, dotView3, dotView4, dotView5, dotView6, dotView7, dotView8]);
+    }
+
+    public type = 'tool: selector';
+
+    public zIndex = 999999999999;
+
     public useCache = true;
+
+    public onMouseDrag(e: IEventObj) {
+        const diffX = e.pos.x - e.prePos.x;
+        const diffY = e.pos.y - e.prePos.y;
+        const [x, y] = [this.currentView!.postion.x + diffX, this.currentView!.postion.y + diffY];
+        this.postion = { x, y };
+    }
 
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.strokeStyle = '#fff';

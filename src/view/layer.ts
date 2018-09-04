@@ -202,6 +202,19 @@ export default abstract class Layer extends BaseView implements IViewEvent {
 
     public onMouseLeave?();
 
+    public getPointWithView(pos: IPostion, v: Layer = this) {
+
+        let { x, y } = pos;
+        let view = v.parentView;
+        while (view) {
+            x -= view.postion.x;
+            y -= view.postion.y;
+            view = view.parentView;
+        }
+
+        return { x, y };
+    }
+
 
     /**
      * 各个子类需要实现的渲染方法

@@ -3,28 +3,28 @@ import SelectorView from './index';
 import globalStore from '../../store/global';
 import { IEventObj } from '../../utils/event';
 
-type Direction = 'left' | 'top' | 'bottom' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+type Direction = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
 
 export default class Point extends LayerView {
 
     get postion() {
         switch (this.direction) {
-            case 'left':
+            case 'w':
                 return {x: 0, y: this.selectorView.size.h / 2};
                 break;
-            case 'top':
+            case 'n':
                 return { x: this.selectorView.size.w / 2, y: 0 };
-            case 'right':
+            case 'e':
                 return { x: this.selectorView.size.w - this.r * 2, y: this.selectorView.size.h / 2 };
-            case 'bottom':
+            case 's':
                 return { x: this.selectorView.size.w / 2, y: this.selectorView.size.h - this.r * 2  };
-            case 'top-left':
+            case 'nw':
                 return { x: 0, y: 0  };
-            case 'top-right':
+            case 'ne':
                 return { x: this.selectorView.size.w - this.r * 2, y: 0 };
-            case 'bottom-left':
+            case 'sw':
                 return { x: 0, y: this.selectorView.size.h - this.r * 2 };
-            case 'bottom-right':
+            case 'se':
                 return { x: this.selectorView.size.w - this.r * 2, y: this.selectorView.size.h - this.r * 2 };
             default:
                 return { x: 0, y: 0};
@@ -63,20 +63,20 @@ export default class Point extends LayerView {
     // }
 
     public onMouseDrag(e: IEventObj) {
-        // this.selectorView.postion = {
-        //     x: e.pos - this.selectorView.frame[0] + this.selectorView.postion.x,
-        //     y: e.offsetY - this.selectorView.frame[1] + this.selectorView.postion.y
-        // };
-        this.selectorView.postion = {
-            x: e.pos.x,
-            y: e.pos.y
-        };
+        switch (this.direction) {
+            case 'nw':
+                 const point = this.getPointWithView(e.pos, this.selectorView.currentView);
+                this.selectorView.postion = point;
+                break;
+
+            default:
+        }
     }
 
 
     public onMouseEnter() {
         this.background = '#ff5a5e';
-        globalStore.context.canvas.style.cursor = 's-resize';
+        globalStore.context.canvas.style.cursor = `${this.direction}-resize`;
     }
 
     public onMouseLeave() {

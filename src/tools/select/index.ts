@@ -1,31 +1,15 @@
-import BaseView from "../../views/base";
-import Model from "./model";
-import GlobalStore from "../../models/global-store";
+import BaseView from '../../views/base';
+import Model from './model';
+import GlobalStore from '../../models/global-store';
 
 /*
  * @Author: lijianzhang
  * @Date: 2018-08-30 20:50:27
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-30 22:12:28
+ * @Last Modified time: 2018-09-04 09:38:32
  */
 
  export default class Select extends BaseView {
-
-    static type = 'tool-select';
-
-    constructor(store: GlobalStore) {
-        super();
-        this.data = new Model(store);
-        this.store = store;
-    }
-
-    useCache = true;
-
-    data: Model;
-
-    store: GlobalStore;
-
-    private _cachePonit?: CanvasRenderingContext2D;
 
     get point() {
         if (!this._cachePonit) {
@@ -42,7 +26,25 @@ import GlobalStore from "../../models/global-store";
         return this._cachePonit;
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    public static type = 'tool-select';
+
+    constructor(store: GlobalStore) {
+        super();
+        this.data = new Model(store);
+        this.store = store;
+    }
+
+    public useCache = true;
+
+    public data: Model;
+
+    public store: GlobalStore;
+
+    public _zIndex = Number.MAX_VALUE;
+
+    private _cachePonit?: CanvasRenderingContext2D;
+
+    public draw(ctx: CanvasRenderingContext2D) {
         const currentView = this.store.currentView;
         if (currentView)  {
             ctx.lineWidth = 1;
@@ -53,7 +55,7 @@ import GlobalStore from "../../models/global-store";
             ctx.strokeStyle = '#000';
             ctx.setLineDash([4, 4]);
             ctx.strokeRect(x, y, w, h);
-            ctx.drawImage(this.point.canvas, x -6, y -6);
+            ctx.drawImage(this.point.canvas, x - 6, y - 6);
         }
     }
  }

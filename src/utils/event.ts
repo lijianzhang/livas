@@ -25,14 +25,14 @@ export default class Event {
         this.canvas = canvas;
         this.canvas.context.canvas.addEventListener('mousedown', this.onMouseDown);
         this.canvas.context.canvas.addEventListener('mousemove', this.onMouseMove);
-        this.canvas.context.canvas.addEventListener('mouseup', this.onMouseUp);
+        document.body.addEventListener('mouseup', this.onMouseUp);
     }
 
     private canvas: CanvasView;
 
     private mousedown = false;
 
-    private dragViews: Set<LayerView> = new Set();
+    private dragView?: LayerView;
 
     private currentViews: Set<LayerView>  = new Set();
 
@@ -52,7 +52,7 @@ export default class Event {
         let bubbling = true;
         while (bubbling && currentView) {
             bubbling = currentView.onMouseDown ? !!currentView.onMouseDown(globalStore.mouse) : true;
-            if (currentView.onMouseDrag) this.dragViews.add(currentView);
+            if (!this.dragView && currentView.onMouseDrag) this.dragView = currentView;
             if (currentView.parentView) {
                 currentView = currentView.parentView;
             } else {
@@ -67,14 +67,12 @@ export default class Event {
 
         globalStore.mouse.prePos = globalStore.mouse.pos;
         // const { left, top } = getElementOffset(e.target);
-        console.log(e.offsetX, e.offsetY);
         // console.log(e.clientX, e.clientY);
         globalStore.mouse.pos = { x: e.offsetX, y: e.offsetY };
         const currentView = this.getHandleEventView(globalStore.mouse.pos, this.canvas);
 
-        if (this.mousedown) {
-            console.log('drag');
-            this.dragViews.forEach(v => v.onMouseDrag!(globalStore.mouse));
+        if (this.mousedown && this.dragView) {
+            this.dragView.onMouseDrag!(globalStore.mouse);
         }
 
         let bubbling = true;
@@ -105,9 +103,15 @@ export default class Event {
         this.currentViews = currentViews;
     }
 
+    private onMouseLeave = () => {
+        this.mousedown = false;
+        this.dragView = undefined;
+        this.currentViews = new Set();
+    }
+
     private onMouseUp = (e: MouseEvent) => {
         this.mousedown = false;
-        this.dragViews = new Set();
+        this.dragView = undefined;
     }
 
     private getHandleEventView(pos: IPostion, view: LayerView | GroupView): LayerView {
