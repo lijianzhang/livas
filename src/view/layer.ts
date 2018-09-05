@@ -122,6 +122,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
     public parentView?: Layer;
 
     public mouseStatus = 'onMouseLeave';
+public void;
 
     /**
      * 是否使用缓存
@@ -143,6 +144,16 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      */
     protected _needForceUpdate = true;
 
+    /**
+     * 各个子类需要实现的渲染方法
+     * 注意点 在绘画过程中, 在draw中原点永远保持0,0 原点和变形都不要在函数内操作, 这些都在 @privateRender里封装
+     *
+     * @abstract
+     * @param {CanvasRenderingContext2D} ctx
+     * @returns {*}
+     * @memberof BaseView
+     */
+    protected abstract;
 
     private _zIndex: number = this.id;
 
@@ -177,6 +188,8 @@ export default abstract class Layer extends BaseView implements IViewEvent {
         // }
 
         const p = this.getPointWithView(pos, this);
+
+        console.log(this.type, p, pos, this.frame);
 
         const [x, y, w, h] = this.frame;
 
@@ -242,30 +255,31 @@ export default abstract class Layer extends BaseView implements IViewEvent {
     public onMouseLeave?();
 
     public getPointWithView(pos: IPostion, v: Layer = this) {
-
         let { x, y } = pos;
         let view = v.parentView;
         while (view) {
-            x -= view.postion.x;
-            y -= view.postion.y;
+            x -= view.getBeforeRotatePos(view.postion).x;
+            y -= view.getBeforeRotatePos(view.postion).y;
             view = view.parentView;
         }
 
         return { x, y };
     }
 
+    public getBeforeRotatePos(pos: IPostion) {
+        const angle = -Math.PI / 180 * this.rotate;
+        // const l = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
+        // console.log(this.type, this.id, l, pos);
+        const centerX = this.frame[0] + this.size.w / 2;
+        const centerY = this.frame[1] + this.size.h / 2;
 
-    /**
-     * 各个子类需要实现的渲染方法
-     * 注意点 在绘画过程中, 在draw中原点永远保持0,0 原点和变形都不要在函数内操作, 这些都在 @privateRender里封装
-     *
-     * @abstract
-     * @param {CanvasRenderingContext2D} ctx
-     * @returns {*}
-     * @memberof BaseView
-     */
-    protected abstract draw(ctx: CanvasRenderingContext2D): void;
+        return {
+            x: (pos.x - centerX) * Math.cos(angle) - (pos.y - centerY) * Math.sin(angle) + centerX,
+            y: (pos.x - centerX) * Math.sin(angle) + (pos.y - centerY) * Math.cos(angle) + centerY
+        };
+    }
 
+    protected abstract draw(ctx: CanvasRenderingContext2D);
     /**
      * 图形的一些基本渲染处理, 主要包括对缓存的处理
      * 子类不应该重写
@@ -285,29 +299,43 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             this.draw(ctx);
             ctx.restore();
         } else {
+            const ww = Math.abs(w);
+            const hh = Math.abs(h);
             const angle = this.rotate * Math.PI / 180;
-            const width = Math.ceil((Math.abs(w * Math.cos(angle) + h * Math.sin(angle)) + left + right + 2) * this.scale[0]);
-            const hegiht = Math.ceil((Math.abs(h * Math.cos(angle) + w * Math.sin(angle)) + top + bottom + 2) * this.scale[1]);
+            const width = Math.ceil(
+                (Math.abs(ww * Math.abs(Math.cos(angle)) + hh * Math.abs(Math.sin(angle))) + left + right + 2) * this.scale[0]
+            );
+            const hegiht = Math.ceil(
+                (Math.abs(hh * Math.abs(Math.cos(angle)) + ww * Math.abs(Math.sin(angle))) + top + bottom + 2) * this.scale[1]
+            );
             if (this._needForceUpdate) {
-                console.log(width, hegiht, w, h);
                 this.cacheCanvasContext.canvas.width = width;
                 this.cacheCanvasContext.canvas.height = hegiht;
                 this.cacheCanvasContext.save();
+
+
+
+
+                this.cacheCanvasContext.translate(width / 2, hegiht / 2);
+                this.cacheCanvasContext.rotate(angle);
+                this.cacheCanvasContext.translate(-ww / 2, -hh / 2);
 
                 if (w < 0 || h < 0) {
                     this.cacheCanvasContext.scale(w < 0 ? -1 : 1, h < 0 ? -1 : 1);
                     this.cacheCanvasContext.translate(w < 0 ? w : 0, h < 0 ? h : 0);
                 }
 
+
+
                 this.cacheCanvasContext.transform(
                     this.scale[0],
                     this.skew[0],
                     this.skew[1],
                     this.scale[1],
-                    (left + 1) + Math.abs(w) * Math.sin(angle),
+                    (left + 1),
                     (top + 1)
                 );
-                this.cacheCanvasContext.rotate(angle);
+
 
 
                 this.draw(this.cacheCanvasContext);
@@ -316,8 +344,8 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             }
 
             ctx.drawImage(this.cacheCanvasContext.canvas,
-                Math.ceil(x - left - 1),
-                Math.ceil(y - top - 1),
+                Math.ceil(x - left - 1) - (width - ww) * Math.sin(angle) / 2,
+                Math.ceil(y - top - 1)  - (hegiht - hh) * Math.sin(angle) / 2,
                 width,
                 hegiht
             );

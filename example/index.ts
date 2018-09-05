@@ -94,16 +94,18 @@ group.size = canvas.size;
 // group.postion = { x: 50, y: 50 };
 const rect =  new RectView();
 rect.lineWidth = 2;
-rect.postion = { x: 20, y: 20 };
+rect.postion = { x: 200, y: 200 };
 rect.color = '#ff5a5e';
-rect.size = { w: 50, h: 50 };
+rect.size = { w: 200, h: 200 };
+rect.rotate = 30;
 
 const rect1 =  new RectView();
 rect1.lineWidth = 2;
 rect1.color = 'blue';
-rect1.size = { w: 50, h: 50 };
+rect1.postion = { x: 200, y: 200 };
+rect1.size = { w: 200, h: 200 };
 
-group.addView(rect1);
+// group.addView(rect1);
 group.addView(rect);
 
 canvas.addView(group);
@@ -115,7 +117,7 @@ brush.opacity = 0.8;
 brush.color = '#ff5a5e';
 brush.postions = [{x: 20, y: 20}, { x: 50, y: 50 }];
 
-group.addView(brush);
+// group.addView(brush);
 
 // group.onMouseDown = () => {
 //     group.postion.x += 1;
@@ -127,22 +129,22 @@ group.addView(brush);
 function getRandomColor() {
     return '#' + (function(h) { return new Array(7 - h.length).join('0') + h; })((Math.random() * 0x1000000 << 0).toString(16)); // tslint:disable-line
   }
-for (let index = 0; index < 5; index += 1) {
-    const el = new RectView();
-    el.lineWidth = Math.floor(Math.random() * 5);
-    el.opacity = 1;
+// for (let index = 0; index < 5; index += 1) {
+//     const el = new RectView();
+//     el.lineWidth = Math.floor(Math.random() * 5);
+//     el.opacity = 1;
 
-    const grd = canvas.context.createLinearGradient(20, 100, 170, 0);
-    grd.addColorStop(0, getRandomColor());
-    grd.addColorStop(1, 'white');
-    Math.random() > 0.5 ? el.color = getRandomColor() : el.backgroundColor = getRandomColor();
-    el.backgroundColor = grd;
-    el.color = getRandomColor();
-    el.rotate = Math.ceil(Math.random() * 180);
-    el.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * innerHeight) };
-    el.size = { w: 400, h: 400 };
-    group.addView(el);
-}
+//     const grd = canvas.context.createLinearGradient(20, 100, 170, 0);
+//     grd.addColorStop(0, getRandomColor());
+//     grd.addColorStop(1, 'white');
+//     Math.random() > 0.5 ? el.color = getRandomColor() : el.backgroundColor = getRandomColor();
+//     el.backgroundColor = grd;
+//     el.color = getRandomColor();
+//     el.rotate = Math.ceil(Math.random() * 180);
+//     el.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * innerHeight) };
+//     el.size = { w: 200, h: 200 };
+//     group.addView(el);
+// }
 
 // setInterval(() => {
 //     group.postion.x += 300;

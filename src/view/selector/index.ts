@@ -88,7 +88,6 @@ export default class Selector extends GroupView {
     }
 
     public draw(ctx: CanvasRenderingContext2D) {
-        console.log(this.frame, this.currentView!.size);
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
         const [, , w, h] = this.frame;
