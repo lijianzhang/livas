@@ -1,5 +1,6 @@
 import GroupView from './group';
 import SelectorView from './selector';
+import GriddingView from './gridding';
 import globalStore from '../store/global';
 import Event from '../utils/event' ;
 
@@ -26,6 +27,9 @@ export default class Canvas extends GroupView  {
 
         this.event = new Event(this);
         this.selector = new SelectorView();
+        const griddingView = new GriddingView();
+        griddingView.size = this.size;
+        this.addView(griddingView);
         this.addView(this.selector);
         globalStore.context = this.context;
         this.forceUpdate();

@@ -91,13 +91,14 @@ gridding.size = { w: innerWidth, h: innerHeight };
 
 const group = new GroupView();
 group.size = canvas.size;
-// group.postion = { x: 200, y: 200 };
+// group.postion = { x: 200, y: 250 };
+// group.rotate = 15;
 const rect =  new RectView();
 rect.lineWidth = 2;
 rect.postion = { x: 200, y: 200 };
 rect.color = '#ff5a5e';
 rect.size = { w: 200, h: 300 };
-rect.rotate = 45;
+rect.rotate = 15;
 
 const rect1 =  new RectView();
 rect1.lineWidth = 2;
@@ -105,10 +106,17 @@ rect1.color = 'blue';
 rect1.postion = { x: 200, y: 200 };
 rect1.size = { w: 200, h: 300 };
 
-group.addView(rect1);
-group.addView(rect);
+const rect2 =  new RectView();
+rect2.lineWidth = 2;
+rect2.color = 'green';
+rect2.postion = { x: 200, y: 200 };
+rect2.size = { w: 200, h: 300 };
 
-canvas.addView(group);
+// canvas.addView(rect2);
+// group.addView(rect1);
+canvas.addView(rect);
+
+// canvas.addView(group);
 
 const brush = new BrushView();
 

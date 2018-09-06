@@ -122,7 +122,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
     public parentView?: Layer;
 
     public mouseStatus = 'onMouseLeave';
-public void;
+    public void;
 
     /**
      * 是否使用缓存
@@ -174,26 +174,15 @@ public void;
      * @memberof BaseView
      */
     public pointInside(pos: IPostion) {
-        // let minX = this.x;
-        // let maxX = this.x + this.size.w;
 
-        // if (this.size.w < 0) {
-        //     [minX, maxX] = [maxX, minX];
-        // }
 
-        // let minY = this.y;
-        // let maxY = this.y + this.size.h;
-        // if (this.size.h < 0) {
-        //     [minY, maxY] = [maxY, minY];
-        // }
+        const p = this.getPointWithView(pos);
 
-        const p = this.getBeforeRotatePos(this.getPointWithView(pos));
+        console.log('this.type', this.type, 'id:', this.id, 'p:', p, 'pos', pos, this.frame);
 
-        console.log(this.type, p, pos, this.getPointWithView(pos), this.frame);
+        const [, , w, h] = this.frame;
 
-        const [x, y, w, h] = this.frame;
-
-        if (x <= p.x && p.x <= x + w && y <= p.y && p.y <= y + h) {
+        if (p.x >= 0 && p.x <= w && p.y >= 0 && p.y <= h) {
             return true;
         }
 
@@ -254,30 +243,57 @@ public void;
 
     public onMouseLeave?();
 
-    public getPointWithView(pos: IPostion, v: Layer = this) {
-        let { x, y } = pos;
-        let view = v.parentView;
-        while (view) {
-            x -= view.postion.x;
-            y -= view.postion.y;
-            view = view.parentView;
+    public getPointWithView(pos: IPostion) {
+        let x = pos.x;
+        let y = pos.y;
+        // const diffX = 0;
+        // const diffY = 0;
+        // const rotate = this.rotate;
+        // if (this.parentView) {
+        //     const p = this.parentView.getPointWithView(pos);
+        //     x = p.x;
+        //     y = p.y;
+        //     // x -= this.parentView.postion.x;
+        //     // y -= this.parentView.postion.y;
+        //     // diffX = this.parentView.postion.x;
+        //     // diffY = this.parentView.postion.y;
+        //     // rotate += this.parentView.rotate;
+        //     console.log(`在${this.parentView.type}${this.parentView.id}坐标系里的xy轴`, x, y);
+        // }
+
+        const angle = Math.PI / 180 * this.rotate;
+
+        console.log(angle);
+
+        if (angle === 0) {
+            return {
+                x: x - this.x,
+                y: y - this.y
+            };
         }
 
-        return { x, y };
-    }
+        x -= this.x;
+        y -= this.y;
 
-    public getBeforeRotatePos(pos: IPostion) {
-        const angle = -Math.PI / 180 * this.rotate;
-        // const l = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
-        // console.log(this.type, this.id, l, pos);
-        const centerX = this.frame[0] + this.size.w / 2;
-        const centerY = this.frame[1] + this.size.h / 2;
+        console.log(x, y);
+        console.log('Math.tan(angle)', Math.tan(angle), 'Math.sin(angle)', Math.sin(angle), 'Math.cos(angle)', Math.cos(angle));
+        const x1 = (x - y * Math.tan(angle)) * Math.cos(angle);
+        const y1 = y / Math.cos(angle) + x1 * Math.tan(angle);
+
+        console.log(x1, y1);
 
         return {
-            x: (pos.x - centerX) * Math.cos(angle) - (pos.y - centerY) * Math.sin(angle) + centerX,
-            y: (pos.x - centerX) * Math.sin(angle) + (pos.y - centerY) * Math.cos(angle) + centerY
+            x: x1,
+            y: y1
         };
+
+        // return {
+        //     x: (x  - centerX) * Math.cos(angle) - (y - centerY) * Math.sin(angle) + centerX - this.postion.x,
+        //     y: (x - centerX) * Math.sin(angle) + (y - centerY) * Math.cos(angle) + centerY - this.postion.y
+        // };
+
     }
+
 
     protected abstract draw(ctx: CanvasRenderingContext2D);
     /**
@@ -350,7 +366,6 @@ public void;
                 hegiht
             );
 
-            ctx.setTransform(1, 0 , 0, 1, 0, 0);
         }
         this._needForceUpdate = false;
     }
