@@ -213,10 +213,6 @@ export default abstract class Layer extends BaseView implements IViewEvent {
 
     }
 
-    public transofrmCtx(ctx: CanvasRenderingContext2D) {
-
-    }
-
 
     protected abstract draw(ctx: CanvasRenderingContext2D);
 
@@ -242,11 +238,13 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             const w$ = Math.abs(w);
             const h$ = Math.abs(h);
             const angle = this.rotate * Math.PI / 180;
-            const cos = Math.abs(Math.cos(angle));
-            const sin = Math.abs(Math.sin(angle));
+            const cos = Math.cos(angle);
+            const cos$ = Math.abs(cos);
+            const sin = Math.sin(angle);
+            const sin$ = Math.abs(sin);
 
-            const width = Math.floor((w$ * cos + h$ * sin) * this.scale[0]);
-            const hegiht = Math.floor((h$ * cos + w$ * sin + top + bottom) * this.scale[1]);
+            const width = Math.floor((w$ * cos$ + h$ * sin$) * this.scale[0]);
+            const hegiht = Math.floor((h$ * cos$ + w$ * sin$ + top + bottom) * this.scale[1]);
 
             console.log(width, hegiht, w$, h$);
 
@@ -260,7 +258,6 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                         Math.floor((width + left + right + 2) / 2),
                         Math.floor((hegiht + left + right + 2) / 2)
                     );
-
                     this.cacheCanvasContext.rotate(angle);
                     this.cacheCanvasContext.translate((-w$ - left - right - 2) / 2, (-h$ - top - bottom - 2) / 2);
                 }
@@ -288,12 +285,22 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                 this.cacheCanvasContext.restore();
             }
 
-            ctx.drawImage(this.cacheCanvasContext.canvas,
-                Math.ceil(x - left - 1) - (width - w$) / 2,
-                Math.ceil(y - top - 1)  - (hegiht - h$) / 2,
-                width,
-                hegiht
-            );
+            if (this.anchor[0] !== 0.5 || this.anchor[1] !== 0.5) {
+                ctx.drawImage(this.cacheCanvasContext.canvas,
+                    Math.ceil(x - left - 1) - (width - w$) / 2 + ((1 - this.anchor[1]) * h$ * sin),
+                    Math.ceil(y - top - 1)  - (hegiht - h$) / 2 + ((1 - this.anchor[0]) * w$ * cos),
+                    width,
+                    hegiht
+                );
+            } else {
+                ctx.drawImage(this.cacheCanvasContext.canvas,
+                    Math.ceil(x - left - 1) - (width - w$) / 2,
+                    Math.ceil(y - top - 1)  - (hegiht - h$) / 2,
+                    width,
+                    hegiht
+                );
+            }
+
 
         }
         this._needForceUpdate = false;
