@@ -1,14 +1,8 @@
 import BaseView, { attr } from './base';
-import CachePool from '../utils/cache-pool';
 import { IPostion } from '../types';
 export { attr, computed } from './base';
 import globalStore from '../store/global';
 import { IViewEvent, IEventObj } from '../utils/event';
-
-// type MOUSE_EVENT = 'mousedown' | 'mouseenter' | 'mouseleave' | 'mousemove' | 'mouseout' | 'mouseover' | 'mouseup';
-
-const cachePool = new CachePool();
-
 
 export default abstract class Layer extends BaseView implements IViewEvent {
 
@@ -21,7 +15,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
     @attr
     get zIndex() {
         if (globalStore.currentView && globalStore.currentView === this) {
-            return Number.MAX_VALUE - 100; // 保证在一些工具图形的下层
+            return Number.MAX_SAFE_INTEGER - 100; // 保证在一些工具图形的下层
         }
 
         return this._zIndex;
@@ -31,19 +25,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
         this._zIndex = value;
     }
 
-    get cacheCanvasContext() {
-        if (this._cacheCanvasContext) return this._cacheCanvasContext;
-        if (!this.useCache) return false;
-        const cache = cachePool.getCache();
-        if (cache) {
-            this._cacheCanvasContext = cache;
-            this._cacheCanvasContext.imageSmoothingEnabled = false;
 
-            return this._cacheCanvasContext;
-        }
-
-        return false;
-    }
 
     /**
      * view相对于整个canvas的原点和宽高 [x, y, w, h];
@@ -121,20 +103,6 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      */
     public parentView?: Layer;
 
-    public mouseStatus = 'onMouseLeave';
-    public void;
-
-    /**
-     * 是否使用缓存
-     *
-     * @protected
-     * @abstract
-     * @type {boolean}
-     * @memberof Layer
-     */
-    protected abstract useCache: boolean;
-
-    protected cachePool = cachePool;
 
     /**
      * 是否需要重新渲染
@@ -157,14 +125,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
 
     private _zIndex: number = this.id;
 
-    /**
-     * 缓存的离屏上下文
-     *
-     * @private
-     * @type {CanvasRenderingContext2D}
-     * @memberof BaseView
-     */
-    private _cacheCanvasContext?: CanvasRenderingContext2D;
+
 
     /**
      * 判断点是否在该view上
@@ -178,11 +139,9 @@ export default abstract class Layer extends BaseView implements IViewEvent {
 
         const p = this.getPointWithView(pos);
 
-        console.log('this.type', this.type, 'id:', this.id, 'p:', p, 'pos', pos, this.frame);
+        const [x, y, w, h] = this.frame;
 
-        const [, , w, h] = this.frame;
-
-        if (p.x >= 0 && p.x <= w && p.y >= 0 && p.y <= h) {
+        if (p.x >= x && p.x <= w + x && p.y >= y && p.y <= h + y) {
             return true;
         }
 
@@ -201,17 +160,6 @@ export default abstract class Layer extends BaseView implements IViewEvent {
         }
     }
 
-    /**
-     * 销毁图形时候触发
-     *
-     * @memberof BaseView
-     */
-    public destory() {
-        if (this._cacheCanvasContext) {
-            cachePool.freeCache(this._cacheCanvasContext);
-            this._cacheCanvasContext = undefined;
-        }
-    }
 
     /**
      * 渲染入口
@@ -246,56 +194,32 @@ export default abstract class Layer extends BaseView implements IViewEvent {
     public getPointWithView(pos: IPostion) {
         let x = pos.x;
         let y = pos.y;
-        // const diffX = 0;
-        // const diffY = 0;
-        // const rotate = this.rotate;
-        // if (this.parentView) {
-        //     const p = this.parentView.getPointWithView(pos);
-        //     x = p.x;
-        //     y = p.y;
-        //     // x -= this.parentView.postion.x;
-        //     // y -= this.parentView.postion.y;
-        //     // diffX = this.parentView.postion.x;
-        //     // diffY = this.parentView.postion.y;
-        //     // rotate += this.parentView.rotate;
-        //     console.log(`在${this.parentView.type}${this.parentView.id}坐标系里的xy轴`, x, y);
-        // }
 
-        const angle = Math.PI / 180 * this.rotate;
-
-        console.log(angle);
-
-        if (angle === 0) {
-            return {
-                x: x - this.x,
-                y: y - this.y
-            };
+        if (this.parentView) {
+            const p = this.parentView.getPointWithView(pos);
+            x = p.x - this.parentView.x;
+            y = p.y - this.parentView.y;
         }
 
-        x -= this.x;
-        y -= this.y;
+        const angle = -Math.PI / 180 * this.rotate;
 
-        console.log(x, y);
-        console.log('Math.tan(angle)', Math.tan(angle), 'Math.sin(angle)', Math.sin(angle), 'Math.cos(angle)', Math.cos(angle));
-        const x1 = (x - y * Math.tan(angle)) * Math.cos(angle);
-        const y1 = y / Math.cos(angle) + x1 * Math.tan(angle);
-
-        console.log(x1, y1);
+        const centerX = this.postion.x + this.size.w / 2;
+        const centerY = this.postion.y + this.size.h / 2;
 
         return {
-            x: x1,
-            y: y1
+            x: (x  - centerX) * Math.cos(angle) - (y - centerY) * Math.sin(angle) + centerX,
+            y: (x - centerX) * Math.sin(angle) + (y - centerY) * Math.cos(angle) + centerY
         };
 
-        // return {
-        //     x: (x  - centerX) * Math.cos(angle) - (y - centerY) * Math.sin(angle) + centerX - this.postion.x,
-        //     y: (x - centerX) * Math.sin(angle) + (y - centerY) * Math.cos(angle) + centerY - this.postion.y
-        // };
+    }
+
+    public transofrmCtx(ctx: CanvasRenderingContext2D) {
 
     }
 
 
     protected abstract draw(ctx: CanvasRenderingContext2D);
+
     /**
      * 图形的一些基本渲染处理, 主要包括对缓存的处理
      * 子类不应该重写
@@ -315,26 +239,31 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             this.draw(ctx);
             ctx.restore();
         } else {
-            const ww = Math.abs(w);
-            const hh = Math.abs(h);
+            const w$ = Math.abs(w);
+            const h$ = Math.abs(h);
             const angle = this.rotate * Math.PI / 180;
-            const width = Math.ceil(
-                (Math.abs(ww * Math.abs(Math.cos(angle)) + hh * Math.abs(Math.sin(angle))) + left + right + 2) * this.scale[0]
-            );
-            const hegiht = Math.ceil(
-                (Math.abs(hh * Math.abs(Math.cos(angle)) + ww * Math.abs(Math.sin(angle))) + top + bottom + 2) * this.scale[1]
-            );
+            const cos = Math.abs(Math.cos(angle));
+            const sin = Math.abs(Math.sin(angle));
+
+            const width = Math.floor((w$ * cos + h$ * sin) * this.scale[0]);
+            const hegiht = Math.floor((h$ * cos + w$ * sin + top + bottom) * this.scale[1]);
+
+            console.log(width, hegiht, w$, h$);
+
             if (this._needForceUpdate) {
-                this.cacheCanvasContext.canvas.width = width;
-                this.cacheCanvasContext.canvas.height = hegiht;
+                this.cacheCanvasContext.canvas.width = width  + left + right + 2;
+                this.cacheCanvasContext.canvas.height = hegiht  + left + right + 2;
                 this.cacheCanvasContext.save();
 
+                if (this.rotate) {
+                    this.cacheCanvasContext.translate(
+                        Math.floor((width + left + right + 2) / 2),
+                        Math.floor((hegiht + left + right + 2) / 2)
+                    );
 
-
-
-                this.cacheCanvasContext.translate(width / 2, hegiht / 2);
-                this.cacheCanvasContext.rotate(angle);
-                this.cacheCanvasContext.translate(-ww / 2, -hh / 2);
+                    this.cacheCanvasContext.rotate(angle);
+                    this.cacheCanvasContext.translate((-w$ - left - right - 2) / 2, (-h$ - top - bottom - 2) / 2);
+                }
 
                 if (w < 0 || h < 0) {
                     this.cacheCanvasContext.scale(w < 0 ? -1 : 1, h < 0 ? -1 : 1);
@@ -360,8 +289,8 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             }
 
             ctx.drawImage(this.cacheCanvasContext.canvas,
-                Math.ceil(x - left - 1) - (width - ww) / 2,
-                Math.ceil(y - top - 1)  - (hegiht - hh) / 2,
+                Math.ceil(x - left - 1) - (width - w$) / 2,
+                Math.ceil(y - top - 1)  - (hegiht - h$) / 2,
                 width,
                 hegiht
             );

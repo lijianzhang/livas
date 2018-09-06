@@ -5,7 +5,7 @@ export default class Gridding extends Base {
 
     constructor() {
         super();
-        this.color = '#666';
+        this.color = 'lightgray';
         this.lineWidth = 1;
     }
 

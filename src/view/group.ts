@@ -10,7 +10,6 @@ export default class GroupView extends LayerView {
 
     constructor() {
         super();
-        this.anchor = [0, 0];
     }
 
     public type = 'group';

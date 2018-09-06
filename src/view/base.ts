@@ -1,16 +1,17 @@
 import 'reflect-metadata';
 import { IPostion, ISize } from '../types';
 import { observable, Observer } from 'liob';
-
+import CachePool from '../utils/cache-pool';
 export { computed, observable } from 'liob';
 
 /*
  * @Author: lijianzhang
  * @Date: 2018-08-28 14:18:55
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-04 23:08:04
+ * @Last Modified time: 2018-09-06 22:27:03
  */
 const attrsMetadataKey = Symbol('attrs');
+const cachePool = new CachePool();
 
 let id = 0;
 
@@ -56,6 +57,28 @@ export default abstract class BaseView {
         return arr;
     }
 
+    get attrNames() {
+        return (this.constructor as typeof BaseView).attrNames;
+    }
+
+    get isEmpty() {
+        return this.size.h === 0 || this.size.w === 0;
+    }
+
+    get cacheCanvasContext() {
+        if (this._cacheCanvasContext) return this._cacheCanvasContext;
+        if (!this.useCache) return false;
+        const cache = cachePool.getCache();
+        if (cache) {
+            this._cacheCanvasContext = cache;
+            this._cacheCanvasContext.imageSmoothingEnabled = false;
+
+            return this._cacheCanvasContext;
+        }
+
+        return false;
+    }
+
     private static _attrNames: string[];
 
     constructor() {
@@ -78,7 +101,7 @@ export default abstract class BaseView {
     public abstract type: string;
 
     /**
-     * 元素锚点
+     * 元素锚点 | 旋转点
      */
     @attr
     public  anchor: [number, number] = [0.5, 0.5];
@@ -186,12 +209,36 @@ export default abstract class BaseView {
 
     public id: number;
 
-    get attrNames() {
-        return (this.constructor as typeof BaseView).attrNames;
-    }
+    /**
+     * 是否使用缓存
+     *
+     * @protected
+     * @abstract
+     * @type {boolean}
+     * @memberof Layer
+     */
+    protected abstract useCache: boolean;
+    protected cachePool = cachePool;
 
-    get isEmpty() {
-        return this.size.h === 0 || this.size.w === 0;
+    /**
+     * 缓存的离屏上下文
+     *
+     * @private
+     * @type {CanvasRenderingContext2D}
+     * @memberof BaseView
+     */
+    private _cacheCanvasContext?: CanvasRenderingContext2D;
+
+    /**
+     * 销毁图形时候触发
+     *
+     * @memberof BaseView
+     */
+    public destory() {
+        if (this._cacheCanvasContext) {
+            cachePool.freeCache(this._cacheCanvasContext);
+            this._cacheCanvasContext = undefined;
+        }
     }
 
 
