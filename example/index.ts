@@ -91,21 +91,21 @@ gridding.size = { w: innerWidth, h: innerHeight };
 
 const group = new GroupView();
 group.size = canvas.size;
-// group.postion = { x: 50, y: 50 };
+// group.postion = { x: 200, y: 200 };
 const rect =  new RectView();
 rect.lineWidth = 2;
 rect.postion = { x: 200, y: 200 };
 rect.color = '#ff5a5e';
-rect.size = { w: 200, h: 200 };
-rect.rotate = 30;
+rect.size = { w: 200, h: 300 };
+rect.rotate = 45;
 
 const rect1 =  new RectView();
 rect1.lineWidth = 2;
 rect1.color = 'blue';
 rect1.postion = { x: 200, y: 200 };
-rect1.size = { w: 200, h: 200 };
+rect1.size = { w: 200, h: 300 };
 
-// group.addView(rect1);
+group.addView(rect1);
 group.addView(rect);
 
 canvas.addView(group);

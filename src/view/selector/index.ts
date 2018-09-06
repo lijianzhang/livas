@@ -64,14 +64,15 @@ export default class Selector extends GroupView {
         super();
         (window as any).b = this;
         const dotView1 = new DotView(this, 'n');
-        const dotView2 = new DotView(this, 'nw');
-        const dotView3 = new DotView(this, 'ne');
-        const dotView4 = new DotView(this, 'w');
-        const dotView5 = new DotView(this, 'e');
-        const dotView6 = new DotView(this, 's');
-        const dotView7 = new DotView(this, 'sw');
-        const dotView8 = new DotView(this, 'se');
-        this.addViews([dotView1, dotView2, dotView3, dotView4, dotView5, dotView6, dotView7, dotView8]);
+        // const dotView2 = new DotView(this, 'nw');
+        // const dotView3 = new DotView(this, 'ne');
+        // const dotView4 = new DotView(this, 'w');
+        // const dotView5 = new DotView(this, 'e');
+        // const dotView6 = new DotView(this, 's');
+        // const dotView7 = new DotView(this, 'sw');
+        // const dotView8 = new DotView(this, 'se');
+        this.addViews([dotView1]);
+        // this.addViews([dotView1, dotView2, dotView3, dotView4, dotView5, dotView6, dotView7, dotView8]);
     }
 
     public type = 'tool: selector';

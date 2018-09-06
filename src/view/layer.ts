@@ -187,9 +187,9 @@ public void;
         //     [minY, maxY] = [maxY, minY];
         // }
 
-        const p = this.getPointWithView(pos, this);
+        const p = this.getBeforeRotatePos(this.getPointWithView(pos));
 
-        console.log(this.type, p, pos, this.frame);
+        console.log(this.type, p, pos, this.getPointWithView(pos), this.frame);
 
         const [x, y, w, h] = this.frame;
 
@@ -258,8 +258,8 @@ public void;
         let { x, y } = pos;
         let view = v.parentView;
         while (view) {
-            x -= view.getBeforeRotatePos(view.postion).x;
-            y -= view.getBeforeRotatePos(view.postion).y;
+            x -= view.postion.x;
+            y -= view.postion.y;
             view = view.parentView;
         }
 
@@ -344,8 +344,8 @@ public void;
             }
 
             ctx.drawImage(this.cacheCanvasContext.canvas,
-                Math.ceil(x - left - 1) - (width - ww) * Math.sin(angle) / 2,
-                Math.ceil(y - top - 1)  - (hegiht - hh) * Math.sin(angle) / 2,
+                Math.ceil(x - left - 1) - (width - ww) / 2,
+                Math.ceil(y - top - 1)  - (hegiht - hh) / 2,
                 width,
                 hegiht
             );
