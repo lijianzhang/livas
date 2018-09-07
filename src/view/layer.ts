@@ -246,8 +246,6 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             const width = Math.floor((w$ * cos$ + h$ * sin$) * this.scale[0]);
             const hegiht = Math.floor((h$ * cos$ + w$ * sin$ + top + bottom) * this.scale[1]);
 
-            console.log(width, hegiht, w$, h$);
-
             if (this._needForceUpdate) {
                 this.cacheCanvasContext.canvas.width = width  + left + right + 2;
                 this.cacheCanvasContext.canvas.height = hegiht  + left + right + 2;
@@ -286,9 +284,24 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             }
 
             if (this.anchor[0] !== 0.5 || this.anchor[1] !== 0.5) {
+
+                const centerX = w$ * (this.anchor[0]);
+                const centerY = h$ * (this.anchor[1]);
+                const ww = w$ * (1 - this.anchor[0]);
+                const hh = h$ * (1 - this.anchor[1]);
+
+                const l = (ww - centerX) * Math.cos(-angle) - (hh - centerY) * Math.sin(-angle) + centerX;
+                const t = (hh - centerY) * Math.cos(-angle) + (ww - centerX) * Math.sin(-angle) + centerY;
+                const centerX1 = width / 2;
+                const centery1 = hegiht / 2;
+                const l1 = (w$ - centerX1) * Math.cos(-angle) - (h$ - centery1) * Math.sin(-angle) + centerX1;
+                const t2 = (h$ - centery1) * Math.cos(-angle) + (w$ - centerX1) * Math.sin(-angle) + centery1;
+
+                console.log(this.type, this.color, l1, t2, l , t);
+
                 ctx.drawImage(this.cacheCanvasContext.canvas,
-                    Math.ceil(x - left - 1) - (width - w$) / 2 + ((1 - this.anchor[1]) * h$ * sin),
-                    Math.ceil(y - top - 1)  - (hegiht - h$) / 2 + ((1 - this.anchor[0]) * w$ * cos),
+                    Math.ceil(x - left - 1) - (l1 - l) / 2,
+                    Math.ceil(y - top - 1)  - (t2 - t) / 2,
                     width,
                     hegiht
                 );
