@@ -91,7 +91,7 @@ gridding.size = { w: innerWidth, h: innerHeight };
 
 const group = new GroupView();
 group.size = canvas.size;
-group.postion = { x: 200, y: 250 };
+// group.postion = { x: 200, y: 250 };
 // group.rotate = 15;
 const rect =  new RectView();
 rect.lineWidth = 4;
@@ -106,7 +106,7 @@ rect1.color = 'blue';
 rect1.anchor = [0, 0];
 rect1.postion = { x: 200, y: 200 };
 rect1.size = { w: 200, h: 300 };
-rect1.rotate = -15;
+rect1.rotate = 15;
 
 const rect2 =  new RectView();
 rect2.lineWidth = 4;
@@ -126,6 +126,13 @@ group.addView(rect);
 
 canvas.addView(group);
 group.addView(rect1);
+
+const rect3 = new RectView();
+rect3.size = { w: 200, h: 200 };
+rect3.lineWidth = 4;
+rect3.color = getRandomColor();
+group.addView(rect3);
+
 
 const brush = new BrushView();
 

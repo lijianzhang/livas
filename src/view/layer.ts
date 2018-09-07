@@ -283,36 +283,25 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                 this.cacheCanvasContext.restore();
             }
 
-            if (this.anchor[0] !== 0.5 || this.anchor[1] !== 0.5) {
+            const centerX = w$ * (this.anchor[0]);
+            const centerY = h$ * (this.anchor[1]);
 
-                const centerX = w$ * (this.anchor[0]);
-                const centerY = h$ * (this.anchor[1]);
-                const ww = w$ * (1 - this.anchor[0]);
-                const hh = h$ * (1 - this.anchor[1]);
 
-                const l = (ww - centerX) * Math.cos(-angle) - (hh - centerY) * Math.sin(-angle) + centerX;
-                const t = (hh - centerY) * Math.cos(-angle) + (ww - centerX) * Math.sin(-angle) + centerY;
-                const centerX1 = width / 2;
-                const centery1 = hegiht / 2;
-                const l1 = (w$ - centerX1) * Math.cos(-angle) - (h$ - centery1) * Math.sin(-angle) + centerX1;
-                const t2 = (h$ - centery1) * Math.cos(-angle) + (w$ - centerX1) * Math.sin(-angle) + centery1;
+            const l = (w$ - centerX) * Math.cos(angle) - (h$ - centerY) * Math.sin(angle) + centerX;
+            const t = (h$ - centerY) * Math.cos(angle) + (w$ - centerX) * Math.sin(angle) + centerY;
 
-                console.log(this.type, this.color, l1, t2, l , t);
+            const l1 = w$ * Math.cos(angle);
+            const t2 = h$ * Math.cos(angle) + w$ * Math.sin(angle);
 
-                ctx.drawImage(this.cacheCanvasContext.canvas,
-                    Math.ceil(x - left - 1) - (l1 - l) / 2,
-                    Math.ceil(y - top - 1)  - (t2 - t) / 2,
-                    width,
-                    hegiht
-                );
-            } else {
-                ctx.drawImage(this.cacheCanvasContext.canvas,
-                    Math.ceil(x - left - 1) - (width - w$) / 2,
-                    Math.ceil(y - top - 1)  - (hegiht - h$) / 2,
-                    width,
-                    hegiht
-                );
-            }
+            console.log(this.type, this.color, [...this.anchor], l1, t2, l , t);
+            console.log(l1 - l, t2 - t);
+
+            ctx.drawImage(this.cacheCanvasContext.canvas,
+                Math.ceil(x - left - 1) - (l1 - l),
+                Math.ceil(y - top - 1)  - (t2 - t),
+                width,
+                hegiht
+            );
 
 
         }
