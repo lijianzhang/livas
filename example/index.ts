@@ -106,21 +106,21 @@ rect1.color = 'blue';
 rect1.anchor = [0, 0];
 rect1.postion = { x: 200, y: 200 };
 rect1.size = { w: 200, h: 300 };
-rect1.rotate = 15;
+rect1.rotate = 180;
 
 const rect2 =  new RectView();
 rect2.lineWidth = 4;
-rect2.anchor = [1 / 4, 1 / 4];
+rect2.anchor = [1 / 2, 0];
 rect2.color = 'green';
 rect2.postion = { x: 200, y: 200 };
 rect2.size = { w: 200, h: 300 };
-rect2.rotate = 90;
+rect2.rotate = 30;
 const grd = canvas.context.createLinearGradient(20, 100, 170, 0);
 grd.addColorStop(0, getRandomColor());
 grd.addColorStop(1, 'white');
-// rect2.backgroundColor = grd;
-// rect.backgroundColor = grd;
-// rect1.backgroundColor = grd;
+rect2.backgroundColor = grd;
+rect.backgroundColor = grd;
+rect1.backgroundColor = grd;
 group.addView(rect2);
 group.addView(rect);
 
@@ -131,7 +131,7 @@ const rect3 = new RectView();
 rect3.size = { w: 200, h: 200 };
 rect3.lineWidth = 4;
 rect3.color = getRandomColor();
-group.addView(rect3);
+// group.addView(rect3);
 
 
 const brush = new BrushView();

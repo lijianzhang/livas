@@ -235,23 +235,25 @@ export default abstract class Layer extends BaseView implements IViewEvent {
             this.draw(ctx);
             ctx.restore();
         } else {
+            // 变量 $ 结尾表示绝对值
             const w$ = Math.abs(w);
             const h$ = Math.abs(h);
-            const angle = this.rotate * Math.PI / 180;
+            const rotate = this.rotate % 360;
+            const angle = rotate * Math.PI / 180;
             const cos = Math.cos(angle);
             const cos$ = Math.abs(cos);
             const sin = Math.sin(angle);
             const sin$ = Math.abs(sin);
 
-            const width = Math.floor((w$ * cos$ + h$ * sin$) * this.scale[0]);
-            const hegiht = Math.floor((h$ * cos$ + w$ * sin$ + top + bottom) * this.scale[1]);
+            const width = Math.floor((w$ * cos$ + h$ * sin$));
+            const hegiht = Math.floor((h$ * cos$ + w$ * sin$));
 
             if (this._needForceUpdate) {
                 this.cacheCanvasContext.canvas.width = width  + left + right + 2;
                 this.cacheCanvasContext.canvas.height = hegiht  + left + right + 2;
                 this.cacheCanvasContext.save();
 
-                if (this.rotate) {
+                if (this.rotate) { // 减少不必要的计算
                     this.cacheCanvasContext.translate(
                         Math.floor((width + left + right + 2) / 2),
                         Math.floor((hegiht + left + right + 2) / 2)
@@ -260,12 +262,10 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                     this.cacheCanvasContext.translate((-w$ - left - right - 2) / 2, (-h$ - top - bottom - 2) / 2);
                 }
 
-                if (w < 0 || h < 0) {
+                if (w < 0 || h < 0) { // 宽高为负数 的时候翻转图形
                     this.cacheCanvasContext.scale(w < 0 ? -1 : 1, h < 0 ? -1 : 1);
                     this.cacheCanvasContext.translate(w < 0 ? w : 0, h < 0 ? h : 0);
                 }
-
-
 
                 this.cacheCanvasContext.transform(
                     this.scale[0],
@@ -276,29 +276,24 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                     (top + 1)
                 );
 
-
-
                 this.draw(this.cacheCanvasContext);
                 this.cacheCanvasContext.setTransform(1, 0, 0, 1, 0, 0);
                 this.cacheCanvasContext.restore();
             }
 
-            const centerX = w$ * (this.anchor[0]);
-            const centerY = h$ * (this.anchor[1]);
+            let differX = 0;
+            let differY = 0;
 
+            if (this.rotate) { // 有旋转再计算 减少计算代码
+                // 函数化简得后的公式
+                differX = w$ * (this.anchor[0] - 0.5) * cos - h$ * (this.anchor[1] - 0.5) * sin - w$ * (this.anchor[0])  + width / 2;
 
-            const l = (w$ - centerX) * Math.cos(angle) - (h$ - centerY) * Math.sin(angle) + centerX;
-            const t = (h$ - centerY) * Math.cos(angle) + (w$ - centerX) * Math.sin(angle) + centerY;
-
-            const l1 = w$ * Math.cos(angle);
-            const t2 = h$ * Math.cos(angle) + w$ * Math.sin(angle);
-
-            console.log(this.type, this.color, [...this.anchor], l1, t2, l , t);
-            console.log(l1 - l, t2 - t);
+                differY = h$ * (this.anchor[1] - 0.5) * cos + w$ * (this.anchor[0] - 0.5) * sin - h$ * (this.anchor[1])  + hegiht / 2;
+            }
 
             ctx.drawImage(this.cacheCanvasContext.canvas,
-                Math.ceil(x - left - 1) - (l1 - l),
-                Math.ceil(y - top - 1)  - (t2 - t),
+                Math.ceil(x  - left - 1) - differX,
+                Math.ceil(y  - top - 1)  - differY,
                 width,
                 hegiht
             );
