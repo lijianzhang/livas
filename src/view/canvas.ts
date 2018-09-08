@@ -1,11 +1,11 @@
-import GroupView from './group';
 import SelectorView from './selector';
 import GriddingView from './gridding';
 import globalStore from '../store/global';
 import Event from '../utils/event' ;
+import Layer from './layer';
 
 
-export default class Canvas extends GroupView  {
+export default class Canvas extends Layer  {
 
     constructor(el: HTMLElement, w: number = 400, h: number = 400) {
         super();
@@ -33,6 +33,7 @@ export default class Canvas extends GroupView  {
         this.addView(this.selector);
         globalStore.context = this.context;
         this.forceUpdate();
+        (window as any).canvas = this;
     }
 
 
@@ -46,7 +47,7 @@ export default class Canvas extends GroupView  {
 
     public useCache = false;
 
-    private event: Event;
+    public event: Event;
 
     private el: HTMLElement;
 
@@ -55,14 +56,8 @@ export default class Canvas extends GroupView  {
 
 
     public render = () => {
-        this.$observer.beginCollectDep();
-        if (this.visible && !this.isEmpty) {
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.save();
-            this.privateRender(this.context);
-            this.context.restore();
-        }
-        this.$observer.endCollectDep();
+        this.context.canvas.width = this.context.canvas.width;
+        super.render(this.context);
         this.willDraw = false;
     }
 
@@ -70,5 +65,9 @@ export default class Canvas extends GroupView  {
         if (this.willDraw) return;
         this.willDraw = true;
         requestAnimationFrame(this.render);
+    }
+
+    public draw() {
+        return undefined;
     }
 }

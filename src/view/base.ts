@@ -146,10 +146,10 @@ export default abstract class BaseView {
     /**
      * 元素的内边距
      *
-     * @type {{ top: number; left: number; right: number; bottom: number }}
+     * @type {[top, left, bottom, right]}
      * @memberof BaseView
      */
-    public  padding?: { top: number; left: number; right: number; bottom: number };
+    public  padding?: [number, number, number, number];
 
     /**
      * 图形宽高

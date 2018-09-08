@@ -2,6 +2,7 @@ import LayerView, { attr } from '../layer';
 import SelectorView from './index';
 import globalStore from '../../store/global';
 import { IEventObj } from '../../utils/event';
+import { IPostion } from '../../types';
 
 type Direction = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
 
@@ -34,6 +35,7 @@ export default class Point extends LayerView {
     get size() {
         return { w: this.r * 2, h: this.r * 2 };
     }
+
     constructor(selectorView: SelectorView, direction: Direction) {
         super();
         this.selectorView = selectorView;
@@ -53,14 +55,27 @@ export default class Point extends LayerView {
 
     public useCache = true;
 
-    // public onMouseDown() {
-    //     this.isDrag = true;
-    //     this.background = '#ff5a5e';
-    //     globalStore.context.canvas.style.cursor = 's-resize';
-    //     globalStore.context.canvas.addEventListener('mousemove', this.changePostion);
+    /**
+     * 判断点是否在该view上
+     *
+     * @param {IPostion} pos
+     * @returns
+     * @memberof BaseView
+     */
+    public pointInside(pos: IPostion) {
 
-    //     return false;
-    // }
+
+        const p = this.getPointWithView(pos);
+
+        const [x, y] = this.frame;
+        const [, , w, h] = this.parentView!.frame;
+
+        if ((p.x - x) ** 2 + (p.y - y) ** 2 < (Math.min(w, h, 80) / 2) ** 2) {
+            return true;
+        }
+
+        return false;
+    }
 
     public onMouseDrag(e: IEventObj) {
         this.background = '#666';

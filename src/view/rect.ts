@@ -24,15 +24,10 @@ import { IPostion, ISize } from '../types';
     @attr
     public backgroundColor?: string;
 
-    get padding() {
+    get padding(): [number, number, number, number] {
         const w = Math.ceil(this.lineWidth / 2);
 
-        return {
-            top: w,
-            left: w,
-            bottom: w,
-            right: w
-        };
+        return [w, w, w, w];
     }
 
     public type = 'rect';

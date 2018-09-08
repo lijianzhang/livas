@@ -17,6 +17,11 @@ export default class Selector extends GroupView {
             [x , y] = [this.currentView.x, this.currentView.y];
             x -= 8;
             y -= 8;
+            if (this.currentView.padding) {
+                const [ t, l ] = this.currentView.padding;
+                x -= l;
+                y -= t;
+            }
             // x -= w < 0 ? 8 : 8;
             // y -= h < 0 ? 8 : 8;
         }
@@ -24,10 +29,19 @@ export default class Selector extends GroupView {
         return { x, y };
     }
 
+
     set postion(pos: IPostion) {
         if (this.currentView) {
             this.currentView.postion = pos;
         }
+    }
+
+    get padding() {
+        if (this.currentView) {
+            return this.currentView.padding;
+        }
+
+        return undefined;
     }
 
     get size() {
@@ -36,6 +50,12 @@ export default class Selector extends GroupView {
             [, , w, h] = this.currentView.frame;
             w += 16;
             h += 16;
+
+            if (this.currentView.padding) {
+                const [ t, l, b, r ] = this.currentView.padding;
+                w += l + r;
+                h += t + b;
+            }
         }
 
         return { w, h };
@@ -95,8 +115,7 @@ export default class Selector extends GroupView {
         const [, , w, h] = this.frame;
         ctx.strokeRect(8, 8, w - 16, h - 16);
         ctx.setLineDash([4, 4]);
-        ctx.strokeStyle = '#000';
+        ctx.strokeStyle = 'rgba(0,0,0,.5)';
         ctx.strokeRect(8, 8, w - 16, h - 16);
-        super.draw(ctx);
     }
 }

@@ -3,6 +3,7 @@ import { IPostion } from '../types';
 export { attr, computed } from './base';
 import globalStore from '../store/global';
 import { IViewEvent, IEventObj } from '../utils/event';
+import { computed } from 'liob';
 
 export default abstract class Layer extends BaseView implements IViewEvent {
 
@@ -28,7 +29,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
 
 
     /**
-     * view相对于整个canvas的原点和宽高 [x, y, w, h];
+     * view相对于父级view的原点和宽高 [x, y, w, h];
      *
      * @readonly
      * @memberof Layer
@@ -87,13 +88,21 @@ export default abstract class Layer extends BaseView implements IViewEvent {
         return y;
     }
 
+    @computed
+    get sortSubViews() {
+        return [...this.subViews].sort((a, b) => {
+            return a.zIndex - b.zIndex;
+        });
+    }
+
     /**
      * 子层的view
      *
      * @type {Layer[]}
      * @memberof Layer
      */
-    public subViews?: Layer[];
+    @attr
+    public subViews: Layer[] = [];
 
     /**
      * 父层view
@@ -124,6 +133,22 @@ export default abstract class Layer extends BaseView implements IViewEvent {
     protected abstract;
 
     private _zIndex: number = this.id;
+
+    public removeView<T extends Layer>(el: T) {
+        const index = this.subViews.findIndex(e => e === el);
+        this.subViews.splice(index, 1);
+        el.parentView = undefined;
+        el.destory();
+    }
+
+    public addView<T extends Layer>(el: T) {
+        this.subViews.push(el);
+        el.parentView = this;
+    }
+
+    public addViews<T extends Layer>(els: T[]) {
+        els.forEach(el => this.addView(el));
+    }
 
 
 
@@ -169,7 +194,7 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      */
     public render(ctx: CanvasRenderingContext2D) {
         this.$observer.beginCollectDep();
-        if (this.parentView && this.visible && !this.isEmpty) {
+        if (this.visible && !this.isEmpty) {
             ctx.save();
             this.privateRender(ctx);
             ctx.restore();
@@ -190,6 +215,51 @@ export default abstract class Layer extends BaseView implements IViewEvent {
     public onMouseDrag?(e: IEventObj);
 
     public onMouseLeave?();
+
+    get canvasSize() {
+        let [, , w, h ] = this.frame;
+        const [top, left , bottom, right] = this.padding || [0, 0, 0, 0];
+        const rotate = this.rotate % 360;
+        const angle = rotate * Math.PI / 180;
+        w = w + left + right;
+        h = h + bottom + top;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+
+        return [ Math.floor((w * cos + h * sin)), Math.floor((h * cos + w * sin))];
+    }
+
+    /**
+     * 实际在画布上的frame
+     *
+     * @readonly
+     * @memberof Layer
+     */
+    get drawFrame() {
+        const [x , y , w, h ] = this.frame;
+        const [top, left , bottom, right] = this.padding || [0, 0, 0, 0];
+
+        if (this.rotate === 0) {
+            return [x, y, w + right + left, h + top + bottom];
+        }
+
+        const w$ = Math.abs(w) + left + right;
+        const h$ = Math.abs(h) + bottom + top;
+        const rotate = this.rotate % 360;
+        const angle = rotate * Math.PI / 180;
+        const cos = Math.cos(angle);
+        const cos$ = Math.abs(cos);
+        const sin = Math.sin(angle);
+        const sin$ = Math.abs(sin);
+
+        const width = Math.floor((w$ * cos$ + h$ * sin$));
+        const hegiht = Math.floor((h$ * cos$ + w$ * sin$));
+        const differX = w$ * (this.anchor[0] - 0.5) * cos - h$ * (this.anchor[1] - 0.5) * sin - w$ * (this.anchor[0])  + width / 2;
+
+        const differY = h$ * (this.anchor[1] - 0.5) * cos + w$ * (this.anchor[0] - 0.5) * sin - h$ * (this.anchor[1])  + hegiht / 2;
+
+        return [x - differX, y - differY, width, hegiht];
+    }
 
     public getPointWithView(pos: IPostion) {
         let x = pos.x;
@@ -224,42 +294,35 @@ export default abstract class Layer extends BaseView implements IViewEvent {
      * @memberof BaseView
      */
     protected privateRender(ctx: CanvasRenderingContext2D) {
-        // const [x1, y1, w , h] = this.frame;
-        const { left, top, bottom, right } = this.padding || { left: 0, right: 0, top: 0, bottom: 0 };
-        const [x , y ] = this.frame;
-        const { w, h } = this.size;
+        const [top, left , bottom, right] = this.padding || [0, 0, 0, 0];
+        const [x , y, w, h ] = this.frame;
 
         if (!this.cacheCanvasContext) {
             ctx.save();
             ctx.translate(Math.ceil(x - (w > 0 ? 0 : w)), Math.ceil(y + (h > 0 ? 0 : h)));
-            this.draw(ctx);
+            this.innerDraw(ctx);
             ctx.restore();
         } else {
             // 变量 $ 结尾表示绝对值
-            const w$ = Math.abs(w);
-            const h$ = Math.abs(h);
+            const w$ = Math.abs(w) + left + right;
+            const h$ = Math.abs(h) + bottom + top;
             const rotate = this.rotate % 360;
             const angle = rotate * Math.PI / 180;
-            const cos = Math.cos(angle);
-            const cos$ = Math.abs(cos);
-            const sin = Math.sin(angle);
-            const sin$ = Math.abs(sin);
 
-            const width = Math.floor((w$ * cos$ + h$ * sin$));
-            const hegiht = Math.floor((h$ * cos$ + w$ * sin$));
+            const [rx, ry , rw, rh] = this.drawFrame;
 
             if (this._needForceUpdate) {
-                this.cacheCanvasContext.canvas.width = width  + left + right + 2;
-                this.cacheCanvasContext.canvas.height = hegiht  + left + right + 2;
+                this.cacheCanvasContext.canvas.width = rw + 2;
+                this.cacheCanvasContext.canvas.height = rh + 2;
                 this.cacheCanvasContext.save();
 
                 if (this.rotate) { // 减少不必要的计算
                     this.cacheCanvasContext.translate(
-                        Math.floor((width + left + right + 2) / 2),
-                        Math.floor((hegiht + left + right + 2) / 2)
+                        Math.floor((rw + 2) / 2),
+                        Math.floor((rh + 2) / 2)
                     );
                     this.cacheCanvasContext.rotate(angle);
-                    this.cacheCanvasContext.translate((-w$ - left - right - 2) / 2, (-h$ - top - bottom - 2) / 2);
+                    this.cacheCanvasContext.translate((-w$ - 2) / 2, (-h$ - 2) / 2);
                 }
 
                 if (w < 0 || h < 0) { // 宽高为负数 的时候翻转图形
@@ -276,30 +339,29 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                     (top + 1)
                 );
 
-                this.draw(this.cacheCanvasContext);
+                this.innerDraw(this.cacheCanvasContext);
                 this.cacheCanvasContext.setTransform(1, 0, 0, 1, 0, 0);
                 this.cacheCanvasContext.restore();
             }
 
-            let differX = 0;
-            let differY = 0;
-
-            if (this.rotate) { // 有旋转再计算 减少计算代码
-                // 函数化简得后的公式
-                differX = w$ * (this.anchor[0] - 0.5) * cos - h$ * (this.anchor[1] - 0.5) * sin - w$ * (this.anchor[0])  + width / 2;
-
-                differY = h$ * (this.anchor[1] - 0.5) * cos + w$ * (this.anchor[0] - 0.5) * sin - h$ * (this.anchor[1])  + hegiht / 2;
-            }
-
             ctx.drawImage(this.cacheCanvasContext.canvas,
-                Math.ceil(x  - left - 1) - differX,
-                Math.ceil(y  - top - 1)  - differY,
-                width,
-                hegiht
+                Math.ceil(rx  - left - 1),
+                Math.ceil(ry  - top - 1),
+                rw,
+                rh
             );
 
 
         }
         this._needForceUpdate = false;
+    }
+
+    private innerDraw(ctx: CanvasRenderingContext2D) {
+        this.draw(ctx);
+        if (this.subViews.length) {
+            for (const view of this.sortSubViews) {
+                view.render(ctx);
+            }
+        }
     }
 }

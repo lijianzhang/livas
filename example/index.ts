@@ -90,11 +90,10 @@ gridding.size = { w: innerWidth, h: innerHeight };
 
 
 const group = new GroupView();
-group.size = canvas.size;
-// group.postion = { x: 200, y: 250 };
+group.postion = {x: 200, y: 0};
 // group.rotate = 15;
 const rect =  new RectView();
-rect.lineWidth = 4;
+rect.lineWidth = 20;
 rect.postion = { x: 200, y: 200 };
 rect.color = '#ff5a5e';
 rect.size = { w: 200, h: 300 };
@@ -110,7 +109,7 @@ rect1.rotate = 180;
 
 const rect2 =  new RectView();
 rect2.lineWidth = 4;
-rect2.anchor = [1 / 2, 0];
+// rect2.anchor = [1 / 2, 0];
 rect2.color = 'green';
 rect2.postion = { x: 200, y: 200 };
 rect2.size = { w: 200, h: 300 };
