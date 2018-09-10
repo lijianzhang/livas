@@ -350,8 +350,6 @@ export default abstract class Layer extends BaseView implements IViewEvent {
                 rw,
                 rh
             );
-
-
         }
         this._needForceUpdate = false;
     }

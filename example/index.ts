@@ -90,7 +90,7 @@ gridding.size = { w: innerWidth, h: innerHeight };
 
 
 const group = new GroupView();
-group.postion = {x: 200, y: 0};
+// group.postion = {x: 200, y: 0};
 // group.rotate = 15;
 const rect =  new RectView();
 rect.lineWidth = 20;

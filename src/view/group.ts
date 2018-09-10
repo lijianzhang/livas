@@ -9,10 +9,27 @@ export default class GroupView extends LayerView {
 
     public subViews: LayerView[] = [];
 
-    @attr
-    public postion = { x: 0, y: 0 };
 
 
+    // public postion = { x: 0, y: 0 };
+    @computed
+    get postion() {
+        const frames = this.subViews.map(v => v.drawFrame);
+
+        const x = Math.min(...frames.map(([x]) => x), 0);
+        const y = Math.min(...frames.map(([, y]) => y), 0);
+
+        return {
+            x,
+            y
+        };
+    }
+
+    set postion(value) {
+
+    }
+
+    @computed
     get size() {
         const frames = this.subViews.map(v => v.drawFrame);
 
