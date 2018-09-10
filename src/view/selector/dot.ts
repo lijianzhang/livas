@@ -51,7 +51,7 @@ export default class Point extends LayerView {
     public r: number = 8;
 
     @attr
-    public background = '#666';
+    public background = '#3f4652';
 
     public useCache = true;
 
@@ -78,9 +78,7 @@ export default class Point extends LayerView {
     }
 
     public onMouseDrag(e: IEventObj) {
-        this.background = '#666';
-        globalStore.context.canvas.style.cursor = 'default';
-
+        this.background = '#ff5a5e';
 
         switch (this.direction) {
             case 'nw': {
@@ -148,14 +146,14 @@ export default class Point extends LayerView {
     }
 
     public onMouseUp() {
-        this.background = '#666';
+        this.background = '#3f4652';
         globalStore.context.canvas.style.cursor = 'default';
 
         return true;
     }
 
     public onMouseLeave() {
-        this.background = '#666';
+        this.background = '#3f4652';
         globalStore.context.canvas.style.cursor = 'default';
     }
 
