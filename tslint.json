@@ -29,8 +29,10 @@
                 "private-instance-method"
             ]
           }],
+        "no-suspicious-comment": false,
         "align": false,
         "variable-name": false,
+        "function-name":false,
         "insecure-random": false,
         "no-redundant-jsdoc": false,
         "prefer-for-of": false,
