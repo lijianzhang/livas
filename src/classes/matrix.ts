@@ -54,7 +54,7 @@ export default class Matrix {
         return new Matrix(cos, sin, -sin, cos, this.tx, this.ty);
     }
 
-    public toArray() {
+    public toArray(): [number, number, number, number, number, number] {
         return [this.a, this.b, this.c, this.d, this.tx, this.ty];
     }
 }

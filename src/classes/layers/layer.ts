@@ -122,6 +122,10 @@ export default class Layer {
             ctx.backgroundColor = this.backgroundColor;
             ctx.fillRect(this.bounds);
         }
+
+        if (this.subLayers.length) {
+            this.subLayers.forEach(l => l.render(ctx));
+        }
     }
 
 
