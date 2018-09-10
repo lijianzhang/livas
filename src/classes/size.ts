@@ -15,14 +15,16 @@ export default class Size {
     public height: number;
 
     /**
-     * TODO: 待完成
      * Returns the point resulting from an affine transformation of an existing point.
      * @param {Matrix} transform
      * @returns {Point}
      * @memberof Point
      */
-    public applying(transform: Matrix): Size {
-        return new Size(1, 1);
+    public applying(transform: Matrix) {
+        const w = transform.a * this.width + transform.c * this.height;
+        const h = transform.b * this.width + transform.d * this.height;
+
+        return new Size(w, h);
     }
 
     /**

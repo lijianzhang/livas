@@ -7,6 +7,17 @@ export default class Matrix {
         return new Matrix(1, 0, 0, 1, tx, ty);
     }
 
+    public static initWithRotate(angle: number) {
+        const cos = Math.cos(angle * Math.PI / 180);
+        const sin = Math.sin(angle * Math.PI / 180);
+
+        return new Matrix(cos, sin, -sin, cos, 0, 0);
+    }
+
+    public static get default() {
+        return new Matrix(1, 0, 0, 1, 0, 0);
+    }
+
 
     constructor(a: number, b: number, c: number, d: number, tx: number, ty: number) {
         this.a = a;
@@ -34,6 +45,13 @@ export default class Matrix {
         const [a, b, c, d] = this.toArray();
 
         return new Matrix(a, b, c, d, x, y);
+    }
+
+    public rotateBy(angle: number) {
+        const cos = Math.cos(angle * Math.PI / 180);
+        const sin = Math.sin(angle * Math.PI / 180);
+
+        return new Matrix(cos, sin, -sin, cos, this.tx, this.ty);
     }
 
     public toArray() {

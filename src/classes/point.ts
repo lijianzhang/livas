@@ -15,14 +15,16 @@ export default class Point {
     public y: number;
 
     /**
-     * TODO: 待完成
      * Returns the point resulting from an affine transformation of an existing point.
      * @param {Matrix} transform
      * @returns {Point}
      * @memberof Point
      */
     public applying(transform: Matrix): Point {
-        return new Point(1, 1);
+        const x = transform.a * this.x + transform.c * this.y + transform.tx;
+        const y = transform.b * this.x + transform.d * this.y + transform.ty;
+
+        return new Point(x, y);
     }
 
     /**

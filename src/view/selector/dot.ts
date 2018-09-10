@@ -7,7 +7,6 @@ import { IPostion } from '../../types';
 type Direction = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
 
 export default class Point extends LayerView {
-
     get postion() {
         switch (this.direction) {
             case 'w':
