@@ -1,68 +1,39 @@
 import Matrix from './matrix';
-import Size from './size';
-import Point from './point';
-
-export default class Rect {
-
-    static get zero() {
-        return new Rect(0, 0, 0, 0);
-    }
+import Size, { ISize } from './size';
+import Point, { IPoint } from './point';
 
 
-    constructor(x: number | Point, y: number | Size, width?: number, height?: number) {
-        if (typeof width === 'number') {
-            this.origin = new Point(x as number, y as number);
-            this.size = new Size(width, height as number);
-        } else {
-            this.size = y as Size;
-            this.origin = x as Point;
-        }
-    }
+export interface IRect extends IPoint, ISize {
 
-    public origin: Point;
-    public size: Size;
+}
 
-    get minX() {
-        return this.origin.x;
-    }
-
-    get minY() {
-        return this.origin.y;
-    }
-
-    get midX() {
-        return this.minX + this.width / 2;
-    }
-
-    get midY() {
-        return this.minY + this.size.height / 2;
-    }
-
-    get maxX() {
-        return this.minX + this.width;
-    }
-
-    get maxY() {
-        return this.minY + this.height;
-    }
-
-    get width() {
-        return this.size.width;
-    }
-
-    get height() {
-        return this.size.height;
-    }
-
-    get isEmpty() {
-        return this.size.width === 0 || this.size.height === 0;
-    }
-
-    get standardized() {
-        let x = this.minX;
-        let y = this.minY;
-        let w = this.width;
-        let h = this.height;
+const Rect = {
+    init(x: number, y: number, w: number, h: number) {
+        return { x, y, w, h };
+    },
+    zero() {
+        return { x: 0, y: 0, h: 0, w: 0 };
+    },
+    midX(rect: IRect) {
+        return rect.x + rect.w / 2;
+    },
+    midY(rect: IRect) {
+        return rect.y + rect.h / 2;
+    },
+    maxX(rect: IRect) {
+        return rect.x + rect.w;
+    },
+    maxY(rect: IRect) {
+        return rect.y + rect.h;
+    },
+    isEmpty(rect: IRect) {
+        return rect.w === 0 || rect.h === 0;
+    },
+    standardized(rect: IRect) {
+        let x = rect.x;
+        let y = rect.y;
+        let w = rect.w;
+        let h = rect.h;
 
         if (w < 0) {
             x += w;
@@ -74,77 +45,36 @@ export default class Rect {
             h = -h;
         }
 
-        return new Rect(x, y, w, h);
-    }
+        return { x, y, w, h };
+    },
+    transform(rect: IRect, transform: Matrix): IRect {
+        const origin = Point.transform(rect, transform);
+        const size = Size.transform(rect, transform);
 
-    /**
-     * Returns a rectangle that is smaller or larger than the source rectangle, with the same center point.
-     *
-     * @param {number} dx
-     * @param {number} dy
-     * @returns
-     * @memberof Rect
-     */
-    public insetBy(dx: number, dy: number) {
-        this.origin.x -= dx;
-        this.origin.y -= dy;
-        this.size.width += dx;
-        this.size.height += dy;
+        return {...origin, ...size};
+    },
+    equalTo(rect: IRect, otherRect: IRect) {
+        return Point.equalTo(rect, otherRect) && Size.equalTo(rect, otherRect);
+    },
+    toArray(rect: IRect): [number, number, number, number] {
+        return [rect.x, rect.y, rect.w, rect.h];
+    },
+    union(r1: IRect, r2: IRect) {
+        const minX = Math.min(r1.x, r2.x);
+        const miny = Math.min(r1.y, r2.y);
+        const maxX = Math.max(r1.x + r1.w, r2.x + r2.w);
+        const maxY = Math.max(r1.y + r1.h, r2.y + r2.h);
 
-        return this;
-    }
-
-    /**
-     *
-     * @param {number} dx
-     * @param {number} dy
-     * @returns a rectangle with an origin that is offset from that of the source rectangle
-     * @memberof Rect
-     */
-    public offsetBy(dx: number, dy: number) {
-        this.origin.x -= dx;
-        this.origin.y -= dy;
-
-        return this;
-    }
-
-    /**
-     * TODO: 待完成
-     * @returns {Point} the point resulting from an affine transformation of an existing point.
-     * @param {Matrix} transform
-     * @memberof Point
-     */
-    public applying(transform: Matrix): Size {
-        const origin = this.origin.applying(transform);
-        const size = this.size.applying(transform);
-
-        return new Rect(origin, size);
-    }
-
-    /**
-     *
-     *
-     * @param {Rect} r2
-     * @returns 返回包含两个矩形的最小矩形
-     * @memberof Rect
-     */
-    public union(r2: Rect) {
-        const minX = Math.min(this.minX, r2.minX);
-        const miny = Math.min(this.minY, r2.minY);
-        const maxX = Math.max(this.maxX, r2.maxX);
-        const maxY = Math.max(this.maxY, r2.maxY);
-
-        return new Rect(minX, miny, maxX, maxY);
-    }
-
-    public intersection(r2: Rect) {
-        let x1 = this.minX;
-        let x2 = r2.minX;
+        return {x: minX, y: miny, w: maxX, h: maxY};
+    },
+    intersection(r1: IRect, r2: IRect) {
+        let x1 = r1.x;
+        let x2 = r2.x;
 
         if (x1 > x2) [x1, x2] = [x2, x1];
 
-        let y1 = this.minY;
-        let y2 = r2.minY;
+        let y1 = r1.y;
+        let y2 = r2.y;
 
         if (y1 > y2) [y1, y2] = [y2, y1];
 
@@ -153,21 +83,8 @@ export default class Rect {
         const w = x2 - x1;
         const h = y2 - y1;
 
-        return new Rect(x, y, w, h);
+        return {x, y, w, h};
     }
+};
 
-    /**
-     * Returns whether two points are equal.
-     *
-     * @param {Point} point
-     * @returns
-     * @memberof Point
-     */
-    public equalTo(rect: Rect) {
-        return this.origin.equalTo(rect.origin) && this.size.equalTo(rect.size);
-    }
-
-    public toArray(): [number, number, number, number] {
-        return [this.origin.x, this.origin.y, this.size.width, this.size.height];
-    }
-}
+export default Rect;

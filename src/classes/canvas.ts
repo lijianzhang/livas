@@ -1,47 +1,62 @@
 import View from './views/view';
-import GraphicsContext from './graphics-context';
 import Rect from './rect';
 
-export default class WindowView {
+export default class CanvasView extends View {
 
     constructor(el: HTMLElement, w: number = 400, h: number = 400) {
+        super();
         this.el = el;
 
         this.canvas = document.createElement('canvas');
         this.canvas.height = h * devicePixelRatio;
         this.canvas.width = w * devicePixelRatio;
+        this.frame = Rect.init(0, 0, w, h);
 
-        this.ctx =  new GraphicsContext(this.canvas.getContext('2d')!);
+        this.ctx = this.canvas.getContext('2d')!;
 
         this.el.appendChild(this.canvas);
 
-        this.rootView = new View();
 
-        this.rootView.backgroundColor = '#ff5a5e';
-        this.rootView.frame = new Rect(200, 50, 200, 200);
+        const subLayer = new View();
+        subLayer.backgroundColor = '#ff5a5e';
+        subLayer.layer.borderColor = '#000';
+        subLayer.layer.borderWidth = 2;
+        subLayer.layer.anchor = [0.5, 0];
+        subLayer.layer.transform.rotateBy(30);
+        subLayer.frame = Rect.init(0, 0, 200, 300);
 
-        this.rootView.render(this.ctx);
+        const subLayer1 = new View();
+        subLayer1.backgroundColor = '#000';
+        subLayer1.layer.borderColor = '#000';
+        subLayer1.layer.borderWidth = 2;
+        subLayer1.layer.anchor = [0, 0];
+        subLayer1.layer.transform.rotateBy(30);
+        subLayer1.frame = Rect.init(100, 20, 30, 30);
+        subLayer.layer.transform.translatedBy(100, 100);
+        this.addSubView(subLayer);
+        subLayer.addSubView(subLayer1);
+
+        this.update();
 
     }
 
     public willDraw = true;
 
-    public rootView: View;
     public canvas: HTMLCanvasElement;
 
-    public ctx: GraphicsContext;
+    public ctx: CanvasRenderingContext2D;
 
     public el: HTMLElement;
 
-    public render = () => {
-        this.ctx.setSize(this.rootView.frame);
-        this.rootView.render(this.ctx);
+
+    public update = () => {
+        this.render(this.ctx);
         this.willDraw = false;
     }
 
     public forceUpdate() {
         if (this.willDraw) return;
         this.willDraw = true;
-        requestAnimationFrame(this.render);
+        requestAnimationFrame(this.update);
     }
 }

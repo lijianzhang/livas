@@ -54,6 +54,10 @@ export default class Matrix {
     }
 
     public rotateBy(angle: number) {
+        let a = angle % 360;
+        if (a > 180) a -= 360;
+        else if (a < -180) a += 360;
+
         const cos = Math.cos(angle * Math.PI / 180);
         const sin = Math.sin(angle * Math.PI / 180);
 
@@ -63,6 +67,10 @@ export default class Matrix {
         this.d *= cos;
 
         return this;
+    }
+
+    public copy() {
+        return new Matrix(...this.toArray());
     }
 
     public mirror() {

@@ -1,46 +1,28 @@
 import Matrix from './matrix';
 
-export default class Point {
-
-    static get zero() {
-        return new Point(0, 0);
-    }
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public x: number;
-    public y: number;
-
-    /**
-     * Returns the point resulting from an affine transformation of an existing point.
-     * @param {Matrix} transform
-     * @returns {Point}
-     * @memberof Point
-     */
-    public applying(transform: Matrix): Point {
-        const x = transform.a * this.x + transform.c * this.y + transform.tx;
-        const y = transform.b * this.x + transform.d * this.y + transform.ty;
-
-        return new Point(x, y);
-    }
-
-    public offsetBy(x: number, y: number) {
-        return new Point(this.x - x, this.y - y);
-    }
-
-    /**
-     * Returns whether two points are equal.
-     *
-     * @param {Point} point
-     * @returns
-     * @memberof Point
-     */
-    public equalTo(point: Point) {
-        return this.x === point.x && this.y === point.y;
-    }
+export interface IPoint {
+    x: number;
+    y: number;
 }
 
-(window as any).Point = Point;
+const Point = {
+    zero() {
+        return { x: 0, y: 0};
+    },
+    transform(point: IPoint, transform: Matrix): IPoint {
+        const x = transform.a * point.x + transform.c * point.y + transform.tx;
+        const y = transform.b * point.x + transform.d * point.y + transform.ty;
+
+        return {x, y};
+    },
+    offsetBy(point: IPoint, x: number, y: number) {
+        return { x: point.x - x, y: point.y - y };
+    },
+    equalTo(point: IPoint, otherPoint: IPoint) {
+        return otherPoint.x === point.x && otherPoint.y === point.y;
+    }
+};
+
+
+export default Point;
+

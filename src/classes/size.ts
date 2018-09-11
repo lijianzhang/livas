@@ -1,45 +1,24 @@
 import Matrix from './matrix';
 
 export interface ISize {
-    width: number;
-    height: number;
+    w: number;
+    h: number;
 }
 
-export default class Size {
+const Size = {
+    zero() {
+        return { w: 0, h: 0 };
+    },
+    transform(size: ISize, m: Matrix) {
+        const w = Math.abs(m.a) * size.w +  Math.abs(m.c) * size.h;
+        const h = Math.abs(m.b) * size.w + Math.abs(m.d) * size.h;
 
-    static get zero() {
-        return new Size(0, 0);
+        return {w, h};
+    },
+    equalTo(size: ISize, otherSize: ISize) {
+        return otherSize.w === size.w && otherSize.h === size.h;
     }
+};
 
-    constructor(width: number, height: number) {
-        this.width = width;
-        this.height = height;
-    }
 
-    public width: number;
-    public height: number;
-
-    /**
-     * Returns the point resulting from an affine transformation of an existing point.
-     * @param {Matrix} transform
-     * @returns {Point}
-     * @memberof Point
-     */
-    public applying(transform: Matrix) {
-        const w = Math.abs(transform.a) * this.width +  Math.abs(transform.c) * this.height;
-        const h = Math.abs(transform.b) * this.width + Math.abs(transform.d) * this.height;
-
-        return new Size(w, h);
-    }
-
-    /**
-     * Returns whether two points are equal.
-     *
-     * @param {Point} point
-     * @returns
-     * @memberof Point
-     */
-    public equalTo(size: Size) {
-        return this.width === size.width && this.height === size.height;
-    }
-}
+export default Size;
