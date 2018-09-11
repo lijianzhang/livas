@@ -1,6 +1,6 @@
 // import { CanvasView, BrushView, RectView, GroupView, GriddingView } from '../src';
 import View from '../src/classes/views/view';
-import Canvas from '../src/classes/views/window';
+import Canvas from '../src/classes/canvas';
 import { store } from 'liob';
 
 (window as any).View = View;

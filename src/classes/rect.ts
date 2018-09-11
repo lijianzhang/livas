@@ -86,12 +86,12 @@ export default class Rect {
      * @memberof Rect
      */
     public insetBy(dx: number, dy: number) {
-        const x = this.origin.x - dx;
-        const y = this.origin.y - dy;
-        const w = this.size.width + dx;
-        const h = this.size.height + dy;
+        this.origin.x -= dx;
+        this.origin.y -= dy;
+        this.size.width += dx;
+        this.size.height += dy;
 
-        return new Rect(x, y, w, h);
+        return this;
     }
 
     /**
@@ -102,10 +102,10 @@ export default class Rect {
      * @memberof Rect
      */
     public offsetBy(dx: number, dy: number) {
-        const x = this.origin.x - dx;
-        const y = this.origin.y - dy;
+        this.origin.x -= dx;
+        this.origin.y -= dy;
 
-        return new Rect(x, y, this.size.width, this.size.height);
+        return this;
     }
 
     /**
@@ -165,5 +165,9 @@ export default class Rect {
      */
     public equalTo(rect: Rect) {
         return this.origin.equalTo(rect.origin) && this.size.equalTo(rect.size);
+    }
+
+    public toArray(): [number, number, number, number] {
+        return [this.origin.x, this.origin.y, this.size.width, this.size.height];
     }
 }

@@ -27,6 +27,10 @@ export default class Point {
         return new Point(x, y);
     }
 
+    public offsetBy(x: number, y: number) {
+        return new Point(this.x - x, this.y - y);
+    }
+
     /**
      * Returns whether two points are equal.
      *
@@ -38,3 +42,5 @@ export default class Point {
         return this.x === point.x && this.y === point.y;
     }
 }
+
+(window as any).Point = Point;

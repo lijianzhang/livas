@@ -1,5 +1,10 @@
 import Matrix from './matrix';
 
+export interface ISize {
+    width: number;
+    height: number;
+}
+
 export default class Size {
 
     static get zero() {
@@ -21,8 +26,8 @@ export default class Size {
      * @memberof Point
      */
     public applying(transform: Matrix) {
-        const w = transform.a * this.width + transform.c * this.height;
-        const h = transform.b * this.width + transform.d * this.height;
+        const w = Math.abs(transform.a) * this.width +  Math.abs(transform.c) * this.height;
+        const h = Math.abs(transform.b) * this.width + Math.abs(transform.d) * this.height;
 
         return new Size(w, h);
     }

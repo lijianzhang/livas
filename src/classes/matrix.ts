@@ -28,6 +28,10 @@ export default class Matrix {
         this.ty = ty;
     }
 
+    get isEmpty() {
+        return this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1 && this.tx === 0 && this.ty === 0;
+    }
+
     public a: number;
     public b: number;
     public c: number;
@@ -36,22 +40,33 @@ export default class Matrix {
     public ty: number;
 
     public scaledBy(x: number, y: number) {
-        const [, b, c, , tx, ty] = this.toArray();
+        this.a *= x;
+        this.d *= y;
 
-        return new Matrix(x, b, c, y, tx, ty);
+        return this;
     }
 
     public translatedBy(x: number, y: number) {
-        const [a, b, c, d] = this.toArray();
+        this.tx += x;
+        this.ty += y;
 
-        return new Matrix(a, b, c, d, x, y);
+        return this;
     }
 
     public rotateBy(angle: number) {
         const cos = Math.cos(angle * Math.PI / 180);
         const sin = Math.sin(angle * Math.PI / 180);
 
-        return new Matrix(cos, sin, -sin, cos, this.tx, this.ty);
+        this.a *= cos;
+        this.b += sin;
+        this.c += -sin;
+        this.d *= cos;
+
+        return this;
+    }
+
+    public mirror() {
+        return new Matrix(this.a, this.b, - this.c, - this.d, this.tx, this.ty);
     }
 
     public toArray(): [number, number, number, number, number, number] {
