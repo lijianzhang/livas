@@ -9,22 +9,48 @@ let id = 0;
 const cachePool = new CachePool();
 export default class View {
 
+    /**
+     * delegate layer frame
+     *
+     * @memberof View
+     */
     get frame() {
         return this.layer.frame;
     }
 
+    /**
+     * delegate layer frame
+     *
+     * @memberof View
+     */
     set frame(rect: IRect) {
         this.layer.frame = rect;
     }
 
+    /**
+     * delegate layer backgroundColor
+     *
+     * @memberof View
+     */
     get backgroundColor() {
         return this.layer.backgroundColor;
     }
 
+    /**
+     * delegate layer backgroundColor
+     *
+     * @memberof View
+     */
     set backgroundColor(color: string) {
         this.layer.backgroundColor = color;
     }
 
+    /**
+     * 离屏canvas 用于缓存, 加速渲染
+     *
+     * @readonly
+     * @memberof View
+     */
     get cacheContext() {
         if (this._cacheContext) return this._cacheContext;
         if (!this.useCache) return false;
@@ -49,22 +75,61 @@ export default class View {
         }, `${this.constructor.name}.render()`);
     }
 
-    public $observer: Observer;
-
+    /**
+     * view的唯一标识
+     *
+     * @type {number}
+     * @memberof View
+     */
     public id: number;
 
+    /**
+     * 每个view都包含一个layer绘制图形
+     *
+     * @memberof View
+     */
     public layer = new Layer();
 
+    /**
+     * 上层view
+     *
+     * @type {View}
+     * @memberof View
+     */
     public superView?: View;
 
+    /**
+     * 下层views
+     *
+     * @type {View[]}
+     * @memberof View
+     */
     public subViews: View[] = [];
 
-    public useCache = true;
+    /**
+     * 是否启动缓存,默认 true
+     *
+     * @memberof View
+     */
+    public useCache = false;
 
-    public _cacheContext?: CanvasRenderingContext2D;
+    private _cacheContext?: CanvasRenderingContext2D;
 
+    private $observer: Observer;
+
+    /**
+     * 是否需要重新渲染
+     *
+     * @private
+     * @memberof View
+     */
     private needUpdate = true;
 
+    /**
+     * 从上级 view 中删除本身
+     *
+     * @memberof View
+     */
     public removeFromSuperLayer() {
         if (this.superView) {
             const index = this.superView.subViews.findIndex(l => l === l);
@@ -102,10 +167,22 @@ export default class View {
         view.superView = this;
     }
 
+    /**
+     * 碰撞检测
+     *
+     * @param {IPoint} pos
+     * @returns
+     * @memberof View
+     */
     public hitTest(pos: IPoint) {
         return !!this.layer.hitTest(pos);
     }
 
+    /**
+     * 触发更新
+     *
+     * @memberof View
+     */
     public forceUpdate() {
         if (this.superView) {
             this.superView.forceUpdate();
@@ -127,6 +204,7 @@ export default class View {
                 this.cacheContext.canvas.height = this.frame.h;
                 this.layer.render(this.cacheContext);
             } else {
+                ctx.translate(x - 1, y - 1);
                 this.layer.render(ctx);
             }
             this.needUpdate = false;

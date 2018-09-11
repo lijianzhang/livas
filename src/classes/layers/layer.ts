@@ -6,12 +6,32 @@ import Matrix from '../matrix';
 
 export interface ILayerDelegate {
     draw?(layer: Layer, context: CanvasRenderingContext2D): any;
+    renderLayer?(ctx: CanvasRenderingContext2D);
     render(ctx: CanvasRenderingContext2D);
     renderSubLayers(ctx: CanvasRenderingContext2D);
 }
 
 @observable
 export default class Layer {
+
+    get frame() {
+        const size = Size.transform(this.bounds, this.transform);
+        const origin = this.getCenter(size);
+
+        return { ...origin, ...size };
+    }
+
+    set frame(rect: IRect) {
+        const { x, y, w, h } = rect;
+        this.bounds.w = w;
+        this.bounds.h = h;
+        this.position = { x, y };
+    }
+
+
+    get isOpaque() {
+        return this.opacity === 1;
+    }
 
     public name?: string;
 
@@ -78,20 +98,6 @@ export default class Layer {
         };
     }
 
-    get frame() {
-        const size = Size.transform(this.bounds, this.transform);
-        const origin = this.getCenter(size);
-
-        return { ...origin, ...size };
-    }
-
-    set frame(rect: IRect) {
-        const { x, y, w, h } = rect;
-        this.bounds.w = w;
-        this.bounds.h = h;
-        this.position = { x, y };
-    }
-
     public hitTest(point: IPoint): boolean {
         const p = Point.transform(Point.offsetBy(point, this.frame.x, this.frame.y), this.transform);
         const [x, y, w, h] = Rect.toArray(this.bounds);
@@ -102,11 +108,6 @@ export default class Layer {
         }
 
         return false;
-    }
-
-
-    get isOpaque() {
-        return this.opacity === 1;
     }
 
     public render(ctx: CanvasRenderingContext2D): any {
@@ -127,6 +128,28 @@ export default class Layer {
         }
 
         ctx.translate(1, 1);
+
+        if (this.delegate && this.delegate.renderLayer) {
+            this.delegate.renderLayer(ctx);
+        } else {
+            this._render(ctx);
+            if (this.delegate && this.delegate.draw) {
+                this.delegate.draw(this, ctx);
+            }
+        }
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.restore();
+    }
+
+    /**
+     * 基本的渲染方法, 如果 delegate 实现了 renderLayer 将不会执行该方法
+     *
+     * @private
+     * @param {CanvasRenderingContext2D} ctx
+     * @memberof Layer
+     */
+    private _render(ctx: CanvasRenderingContext2D) {
         if (this.backgroundColor) {
             const frame = {...this.bounds};
             if (this.borderWidth && this.borderColor) {
@@ -153,11 +176,5 @@ export default class Layer {
         if (this.delegate) {
             this.delegate.renderSubLayers(ctx);
         }
-
-        if (this.delegate && this.delegate.draw) {
-            this.delegate.draw(this, ctx);
-        }
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.restore();
     }
 }
