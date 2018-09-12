@@ -123,7 +123,6 @@ export default class Layer {
         }
 
         if (this.superLayer) {
-            console.log(this.frame);
             ctx.translate(this.frame.x, this.frame.y);
         }
 

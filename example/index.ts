@@ -6,7 +6,8 @@ import { store } from 'liob';
 (window as any).View = View;
 
 // store.useLog();
-const canvas = new Canvas(document.getElementById('canvas'), 800, 800);
+const canvas = new Canvas(document.getElementById('canvas'), innerWidth, innerHeight);
+// canvas.backgroundColor =  '#000';
 (window as any).canvas = canvas;
 
 // canvas.canvas.style.border = '1px solid lightgray';
@@ -80,16 +81,14 @@ const canvas = new Canvas(document.getElementById('canvas'), 800, 800);
 //     preY = 0;
 // });
 
-// for (let index = 0; index < 100; index += 1) {
-//     const el = new RectView();
-//     canvas.addView(el);
-//     el.lineWidth = 1;
-//     el.opacity = 1;
-//     el.strokeColor = '#ff5a5e';
-
-//     el.postion = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * 504) };
-//     el.size = { w: 999, h: 999 };
-// }
+for (let index = 0; index < 10000; index += 1) {
+    const el = new View();
+    el.layer.borderWidth = 1;
+    el.layer.borderColor = '#000';
+    el.backgroundColor = '#ff5a5e';
+    el.frame = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * 504), w: 200, h: 200 };
+    canvas.addSubView(el);
+}
 // canvas.draw();
 
 

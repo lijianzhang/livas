@@ -2282,9 +2282,9 @@ levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-liob@^0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/liob/-/liob-0.5.2.tgz#c168652eb0081ee9c3e4f575a3b4f6599e3bf0fb"
+liob@^0.5.4:
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/liob/-/liob-0.5.4.tgz#9f773e0743593010a4102ff8b14f44bd81ac396e"
   dependencies:
     react "^16.2.0"
     react-dom "^16.2.0"

@@ -1,4 +1,4 @@
-import { Observer } from 'liob';
+import { Observer, observable } from 'liob';
 import Layer from '../layers/layer';
 import Rect from '../rect';
 import { IPoint } from '../point';
@@ -71,7 +71,6 @@ export default class View {
         id += id;
         this.id = id;
         this.$observer = new Observer(() => {
-            this.needUpdate = true;
             this.forceUpdate();
         }, `${this.constructor.name}.render()`);
     }
@@ -105,6 +104,7 @@ export default class View {
      * @type {View[]}
      * @memberof View
      */
+    @observable
     public subViews: View[] = [];
 
     /**
@@ -112,19 +112,11 @@ export default class View {
      *
      * @memberof View
      */
-    public useCache = false;
+    public useCache = true;
 
     private _cacheContext?: CanvasRenderingContext2D;
 
     private $observer: Observer;
-
-    /**
-     * 是否需要重新渲染
-     *
-     * @private
-     * @memberof View
-     */
-    private needUpdate = true;
 
     /**
      * 从上级 view 中删除本身
@@ -185,7 +177,6 @@ export default class View {
      * @memberof View
      */
     public forceUpdate() {
-        console.log(this.superView);
         if (this.superView) {
             this.superView.forceUpdate();
         }
@@ -198,23 +189,16 @@ export default class View {
     }
 
     public render(ctx: CanvasRenderingContext2D) {
+        this.$observer.beginCollectDep();
         const { w, h, x , y } = this.layer.frame;
-        console.log('this.needUpdate', this.needUpdate);
-        if (this.needUpdate) {
-            this.$observer.beginCollectDep();
+
+        if (this.$observer.change) {
             if (this.cacheContext) {
-                this.cacheContext.canvas.width = this.frame.w;
                 this.cacheContext.canvas.height = this.frame.h;
+                this.cacheContext.canvas.width = this.frame.w;
                 this.layer.render(this.cacheContext);
-            } else {
-                ctx.translate(x - 1, y - 1);
-                this.layer.render(ctx);
             }
-            this.needUpdate = false;
-            this.$observer.endCollectDep();
-        } else {
-            ctx.translate(x - 1, y - 1);
-            this.layer.render(ctx);
+
         }
 
         if (this.cacheContext) {
@@ -222,6 +206,11 @@ export default class View {
                 this.cacheContext.canvas,
                 x - 1, y - 1, w, h
             );
+        } else {
+            ctx.translate(x - 1, y - 1);
+            this.layer.render(ctx);
         }
+
+        this.$observer.endCollectDep();
     }
 }
