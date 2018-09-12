@@ -71,6 +71,7 @@ export default class View {
         id += id;
         this.id = id;
         this.$observer = new Observer(() => {
+            this.needUpdate = true;
             this.forceUpdate();
         }, `${this.constructor.name}.render()`);
     }
@@ -184,6 +185,7 @@ export default class View {
      * @memberof View
      */
     public forceUpdate() {
+        console.log(this.superView);
         if (this.superView) {
             this.superView.forceUpdate();
         }
@@ -197,6 +199,7 @@ export default class View {
 
     public render(ctx: CanvasRenderingContext2D) {
         const { w, h, x , y } = this.layer.frame;
+        console.log('this.needUpdate', this.needUpdate);
         if (this.needUpdate) {
             this.$observer.beginCollectDep();
             if (this.cacheContext) {
@@ -209,6 +212,9 @@ export default class View {
             }
             this.needUpdate = false;
             this.$observer.endCollectDep();
+        } else {
+            ctx.translate(x - 1, y - 1);
+            this.layer.render(ctx);
         }
 
         if (this.cacheContext) {
