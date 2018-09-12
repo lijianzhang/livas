@@ -1,13 +1,15 @@
-import { Observer, observable } from 'liob';
+import { Observer, observable, computed } from 'liob';
 import Layer from '../layers/layer';
 import Rect from '../rect';
 import { IPoint } from '../point';
 import { IRect } from '../../types';
 import CachePool from '../../utils/cache-pool';
+import Responder from './responder';
+import globalStore from '../../store/global';
 
 let id = 0;
 const cachePool = new CachePool();
-export default class View {
+export default class View extends Responder {
 
     /**
      * delegate layer frame
@@ -17,6 +19,7 @@ export default class View {
     get frame() {
         return this.layer.frame;
     }
+
 
     /**
      * delegate layer frame
@@ -65,7 +68,27 @@ export default class View {
         return false;
     }
 
+    get zIndex() {
+        if (globalStore.currentView && globalStore.currentView === this) {
+            return Number.MAX_SAFE_INTEGER - 100; // 保证在一些工具图形的下层
+        }
+
+        return this._zIndex;
+    }
+
+    set zIndex(value: number) {
+        this._zIndex = value;
+    }
+
+    @computed
+    get sortSubViews() {
+        return [...this.subViews].sort((a, b) => {
+            return a.zIndex - b.zIndex;
+        });
+    }
+
     constructor(rect: IRect = Rect.zero()) {
+        super();
         this.layer.frame = rect;
         this.layer.delegate = this;
         id += id;
@@ -113,6 +136,8 @@ export default class View {
      * @memberof View
      */
     public useCache = true;
+
+    private _zIndex: number = this.id;
 
     private _cacheContext?: CanvasRenderingContext2D;
 
@@ -167,8 +192,21 @@ export default class View {
      * @returns
      * @memberof View
      */
-    public hitTest(pos: IPoint) {
-        return !!this.layer.hitTest(pos);
+    public hitTest(pos: IPoint): View | null {
+        if (this.layer.hitTest(pos)) {
+            if (this.subViews) {
+                const p = { x: pos.x - this.frame.x, y: pos.y - this.frame.y };
+                // console.log(pos, {...this.frame});
+                for (let index = this.sortSubViews.length - 1; index >= 0; index -= 1) {
+                    const view = this.sortSubViews[index].hitTest(p);
+                    if (view) return view;
+                }
+            }
+
+            return this;
+        }
+
+        return null;
     }
 
     /**

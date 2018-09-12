@@ -1,9 +1,9 @@
-import { LayerView } from '../view';
+import View from '../classes/views/view';
 import { observable } from 'liob';
 import { IPostion } from '../types';
 @observable
 export class GlobalStore {
-    public currentView?: LayerView;
+    public currentView?: View;
 
     public isSelect = false;
 

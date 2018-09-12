@@ -99,7 +99,12 @@ export default class Layer {
     }
 
     public hitTest(point: IPoint): boolean {
-        const p = Point.transform(Point.offsetBy(point, this.frame.x, this.frame.y), this.transform);
+        let p = {...point};
+        p.x -= this.transform.tx;
+        p.y -= this.transform.ty;
+        p = Point.offsetBy(p, this.frame.x, this.frame.y);
+        p = Point.transform(p, this.transform);
+        console.log('layer hitTest', 'point', {...point}, p, {...this.frame});
         const [x, y, w, h] = Rect.toArray(this.bounds);
 
         if (p.x >= x && p.x <= w + x && p.y >= y && p.y <= h + y) {

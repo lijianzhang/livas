@@ -81,14 +81,14 @@ const canvas = new Canvas(document.getElementById('canvas'), innerWidth, innerHe
 //     preY = 0;
 // });
 
-for (let index = 0; index < 10000; index += 1) {
-    const el = new View();
-    el.layer.borderWidth = 1;
-    el.layer.borderColor = '#000';
-    el.backgroundColor = '#ff5a5e';
-    el.frame = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * 504), w: 200, h: 200 };
-    canvas.addSubView(el);
-}
+// for (let index = 0; index < 10000; index += 1) {
+//     const el = new View();
+//     el.layer.borderWidth = 1;
+//     el.layer.borderColor = '#000';
+//     el.backgroundColor = '#ff5a5e';
+//     el.frame = { x: Math.floor(Math.random() * innerWidth), y: Math.floor(Math.random() * 504), w: 200, h: 200 };
+//     canvas.addSubView(el);
+// }
 // canvas.draw();
 
 
