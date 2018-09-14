@@ -1,7 +1,7 @@
 import { Observer, observable, computed } from 'liob';
 import Layer from '../layers/layer';
 import Rect from '../rect';
-import { IPoint } from '../point';
+import Point, { IPoint } from '../point';
 import { IRect } from '../../types';
 import CachePool from '../../utils/cache-pool';
 import Responder from './responder';
@@ -91,7 +91,7 @@ export default class View extends Responder {
         super();
         this.layer.frame = rect;
         this.layer.delegate = this;
-        id += id;
+        id += 1;
         this.id = id;
         this.$observer = new Observer(() => {
             this.forceUpdate();
@@ -195,8 +195,10 @@ export default class View extends Responder {
     public hitTest(pos: IPoint): View | null {
         if (this.layer.hitTest(pos)) {
             if (this.subViews) {
-                const p = { x: pos.x - this.frame.x, y: pos.y - this.frame.y };
-                // console.log(pos, {...this.frame});
+                const p = Point.offsetBy(this.layer.getPointWithView(pos),
+                    this.layer.position.x,
+                    this.layer.position.y
+                );
                 for (let index = this.sortSubViews.length - 1; index >= 0; index -= 1) {
                     const view = this.sortSubViews[index].hitTest(p);
                     if (view) return view;
@@ -232,8 +234,8 @@ export default class View extends Responder {
 
         if (this.$observer.change) {
             if (this.cacheContext) {
-                this.cacheContext.canvas.height = this.frame.h;
-                this.cacheContext.canvas.width = this.frame.w;
+                this.cacheContext.canvas.height = this.frame.h + 2;
+                this.cacheContext.canvas.width = this.frame.w + 2;
                 this.layer.render(this.cacheContext);
             }
 
@@ -245,7 +247,7 @@ export default class View extends Responder {
                 x - 1, y - 1, w, h
             );
         } else {
-            ctx.translate(x - 1, y - 1);
+            ctx.translate(x, y);
             this.layer.render(ctx);
         }
 

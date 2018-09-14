@@ -19,7 +19,7 @@ export default class Matrix {
     }
 
 
-    constructor(a: number, b: number, c: number, d: number, tx: number, ty: number) {
+    constructor(a: number = 1, b: number = 0, c: number = 0, d: number = 1, tx: number = 0, ty: number = 0) {
         this.a = a;
         this.b = b;
         this.c = c;
@@ -42,6 +42,10 @@ export default class Matrix {
     public scaledBy(x: number, y: number) {
         this.a *= x;
         this.d *= y;
+        this.c *= x;
+        this.b *= y;
+        this.tx *= x;
+        this.ty *= y;
 
         return this;
     }
@@ -61,10 +65,15 @@ export default class Matrix {
         const cos = Math.cos(angle * Math.PI / 180);
         const sin = Math.sin(angle * Math.PI / 180);
 
-        this.a *= cos;
-        this.b += sin;
-        this.c += -sin;
-        this.d *= cos;
+        const a1 = this.a;
+        const c1 = this.c;
+        const tx1 = this.tx;
+        this.a = (a1 * cos) - (this.b * sin);
+        this.b = (a1 * sin) + (this.b * cos);
+        this.c = (c1 * cos) - (this.d * sin);
+        this.d = (c1 * sin) + (this.d * cos);
+        this.tx = (tx1 * cos) - (this.ty * sin);
+        this.ty = (tx1 * sin) + (this.ty * cos);
 
         return this;
     }
@@ -74,10 +83,25 @@ export default class Matrix {
     }
 
     public mirror() {
-        return new Matrix(this.a, this.b, - this.c, - this.d, this.tx, this.ty);
+        const a1 = this.a;
+        const b1 = this.b;
+        const c1 = this.c;
+        const d1 = this.d;
+        const tx1 = this.tx;
+        const n = (a1 * d1) - (b1 * c1);
+        this.a = d1 / n;
+        this.b = -b1 / n;
+        this.c = -c1 / n;
+        this.d = a1 / n;
+        this.tx = ((c1 * this.ty) - (d1 * tx1)) / n;
+        this.ty = -((a1 * this.ty) - (b1 * tx1)) / n;
+
+        return this;
     }
 
     public toArray(): [number, number, number, number, number, number] {
         return [this.a, this.b, this.c, this.d, this.tx, this.ty];
     }
 }
+
+(window as any).Matrix = Matrix;

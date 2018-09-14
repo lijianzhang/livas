@@ -98,14 +98,19 @@ export default class Layer {
         };
     }
 
+    get anchorPoint() {
+        return {
+            x: this.position.x + this.frame.w * this.anchor[0],
+            y: this.position.y + this.frame.h * this.anchor[1]
+        };
+    }
+
     public hitTest(point: IPoint): boolean {
-        let p = {...point};
-        p.x -= this.transform.tx;
-        p.y -= this.transform.ty;
-        p = Point.offsetBy(p, this.frame.x, this.frame.y);
-        p = Point.transform(p, this.transform);
-        console.log('layer hitTest', 'point', {...point}, p, {...this.frame});
-        const [x, y, w, h] = Rect.toArray(this.bounds);
+        const p = this.getPointWithView(point);
+        console.log('point', point, 'p', p, {...this.bounds, ...this.position }, 'anchor', this.anchorPoint);
+
+        const { w, h } = this.bounds;
+        const { x, y } = this.position;
 
         if (p.x >= x && p.x <= w + x && p.y >= y && p.y <= h + y) {
 
@@ -113,6 +118,10 @@ export default class Layer {
         }
 
         return false;
+    }
+
+    public getPointWithView(pos: IPoint) {
+        return Point.rotateByCenter(pos, this.transform.copy().mirror(), this.anchorPoint);
     }
 
     public render(ctx: CanvasRenderingContext2D): any {
@@ -157,10 +166,10 @@ export default class Layer {
         if (this.backgroundColor) {
             const frame = {...this.bounds};
             if (this.borderWidth && this.borderColor) {
-                frame.x += this.borderWidth;
-                frame.y += this.borderWidth;
-                frame.w -= this.borderWidth * 2;
-                frame.h -= this.borderWidth * 2;
+                // frame.x += this.borderWidth;
+                // frame.y += this.borderWidth;
+                // frame.w -= this.borderWidth * 2;
+                // frame.h -= this.borderWidth * 2;
             }
             ctx.fillStyle = this.backgroundColor;
             ctx.fillRect(...Rect.toArray(frame));
@@ -168,10 +177,10 @@ export default class Layer {
 
         if (this.borderColor && this.borderWidth) {
             const frame = {...this.bounds};
-            frame.x += this.borderWidth;
-            frame.y += this.borderWidth;
-            frame.w -= this.borderWidth * 2;
-            frame.h -= this.borderWidth * 2;
+            // frame.x += this.borderWidth;
+            // frame.y += this.borderWidth;
+            // frame.w -= this.borderWidth * 2;
+            // frame.h -= this.borderWidth * 2;
             ctx.strokeStyle = this.borderColor;
             ctx.lineWidth = this.borderWidth;
             ctx.strokeRect(...Rect.toArray(frame));

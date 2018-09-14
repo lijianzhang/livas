@@ -72,6 +72,7 @@ export default class Event {
         // const { left, top } = getElementOffset(e.target);
         // console.log(e.clientX, e.clientY);
         globalStore.mouse.pos = { x: e.offsetX, y: e.offsetY };
+        console.log(e.offsetX);
         const currentView = this.canvas.hitTest(globalStore.mouse.pos);
 
         if (this.mousedown && this.dragView) {

@@ -6,7 +6,8 @@ import { store } from 'liob';
 (window as any).View = View;
 
 // store.useLog();
-const canvas = new Canvas(document.getElementById('canvas'), innerWidth, innerHeight);
+const canvas = new Canvas(document.getElementById('canvas'), 800, innerHeight);
+canvas.canvas.style.marginLeft = '40px';
 // canvas.backgroundColor =  '#000';
 (window as any).canvas = canvas;
 
