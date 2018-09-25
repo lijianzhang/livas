@@ -1,5 +1,7 @@
 import View from '../views/view';
+import Stage from '../views/stage';
 import { getElementOffset } from './dom';
+import globalStore from '../store/global';
 
 export interface IViewEvent {
     subViews?: IViewEvent[];
@@ -13,20 +15,20 @@ export interface IViewEvent {
 }
 
 export interface IEvent {
-    pos: IPostion;
-    prePos: IPostion;
+    pos: [number, number];
+    prePos: [number, number];
 }
 
 export default class Event {
 
-    constructor(canvas: View) {
-        this.canvas = canvas;
-        this.canvas.ctx.canvas.addEventListener('mousedown', this.onMouseDown);
-        this.canvas.ctx.canvas.addEventListener('mousemove', this.onMouseMove);
+    constructor(stage: Stage) {
+        this.stage = stage;
+        this.stage.canvas.addEventListener('mousedown', this.onMouseDown);
+        this.stage.canvas.addEventListener('mousemove', this.onMouseMove);
         document.body.addEventListener('mouseup', this.onMouseUp);
     }
 
-    private canvas: View;
+    private stage: Stage;
 
     private mousedown = false;
 
@@ -39,16 +41,11 @@ export default class Event {
     }
 
     private onMouseDown = (e: MouseEvent) => {
-        console.log(e);
         this.mousedown = true;
-        let currentView = this.canvas.hitTest(globalStore.mouse.pos);
-        if (currentView) console.log(currentView.frame);
-        // if (currentView.type.indexOf('tool') === -1) {
-        //     globalStore.currentView = currentView;
-        // }
-        // const { left, top } = getElementOffset(e.target);
-        globalStore.mouse.pos = { x: e.offsetX, y: e.offsetY };
-        // globalStore.mouse.pos = { x: left + e.offsetX, y: top + e.offsetY };
+        let currentView = this.stage.hitTest(globalStore.mouse.pos);
+        globalStore.mouse.pos = [e.offsetX, e.offsetY];
+        globalStore.currentView = currentView;
+
         let bubbling = true;
         while (bubbling && currentView) {
             bubbling = currentView.onMouseDown ? !!currentView.onMouseDown(globalStore.mouse) : true;
@@ -65,11 +62,8 @@ export default class Event {
         const preViews = this.currentViews;
         const currentViews: Set<View> = new Set();
 
-
-        // const { left, top } = getElementOffset(e.target);
-        // console.log(e.clientX, e.clientY);
-        console.log(e.offsetX);
-        const currentView = this.canvas.hitTest([e.offsetX, e.offsetY]);
+        let currentView = this.stage.hitTest([e.offsetX, e.offsetY]);
+        console.log(currentView);
 
         if (this.mousedown && this.dragView) {
             this.dragView.onMouseDrag!(globalStore.mouse);
@@ -90,7 +84,7 @@ export default class Event {
 
             preViews.delete(currentView);
             currentViews.add(currentView);
-            (currentView as any) = currentView.superView;
+            currentView = currentView.superView;
             if (!currentView) {
                 bubbling = false;
             }

@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-09-25 15:32:46
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 02:44:46
+ * @Last Modified time: 2018-09-26 04:47:48
  */
 import Matrix from '../utils/matrix';
 import { observable } from 'liob';

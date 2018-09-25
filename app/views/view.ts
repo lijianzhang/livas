@@ -7,9 +7,10 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-09-25 20:57:50
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 02:44:11
+ * @Last Modified time: 2018-09-26 04:48:19
  */
 
+let id = 0;
 export default class View extends Responder {
 
     get cacheCanvasContext() {
@@ -25,13 +26,42 @@ export default class View extends Responder {
 
         return false;
     }
+
+    get x() {
+        if (this.superView) {
+            return this.superView.x + this.layer.x;
+        }
+
+        return this.layer.x;
+    }
+
+    get y() {
+        if (this.superView) {
+            return this.superView.y + this.layer.y;
+        }
+
+        return this.layer.y;
+    }
+
+    get w() {
+        return this.layer.w;
+    }
+
+    get h() {
+        return this.layer.h;
+    }
+
     constructor(x: number, y: number, w: number, h: number) {
         super();
+        id += 1;
+        this.id = id;
         this.layer = new Layer(x, y, w, h);
         this.$observer = new Observer(() => {
             this.forceUpdate();
         }, `${this.constructor.name}.render()`);
     }
+
+    public id: number;
 
     public layer: Layer;
 
@@ -51,6 +81,8 @@ export default class View extends Responder {
      * @memberof BaseView
      */
     private _cacheCanvasContext?: CanvasRenderingContext2D;
+
+    public draw?(ctx: CanvasRenderingContext2D);
 
     /**
      * 触发更新
@@ -85,20 +117,24 @@ export default class View extends Responder {
         console.log('destory');
     }
 
-    private get x() {
-        if (this.superView) {
-            return this.superView.x + this.layer.x;
+    public hitTest(pos: [number, number]) {
+        const [x, y] = pos;
+        console.log(x, y);
+        if (x >= this.x && x <= this.layer.w + this.x && y >= this.y && y <= this.layer.h + this.y) {
+
+            if (this.subViews.length) {
+                for (let index = 0; index < this.subViews.length; index += 1) {
+                    const view = this.subViews[index].hitTest(pos);
+                    if (view && !view.draw) {
+                        return view;
+                    }
+                }
+            }
+
+            return this;
         }
 
-        return this.layer.x;
-    }
-
-    private get y() {
-        if (this.superView) {
-            return this.superView.y + this.layer.y;
-        }
-
-        return this.layer.y;
+        return null;
     }
 
     public render(ctx: CanvasRenderingContext2D) {
@@ -107,20 +143,24 @@ export default class View extends Responder {
             ctx.save();
             ctx.translate(this.x, this.y);
             this.layer.draw(ctx);
+            if (this.draw) {
+                this.draw(ctx);
+            }
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.restore();
         } else {
             if (this.$observer.change) {
                 this.cacheCanvasContext.save();
-                this.cacheCanvasContext.canvas.width = this.layer.w + 2;
-                this.cacheCanvasContext.canvas.height = this.layer.h + 2;
+                this.cacheCanvasContext.canvas.width = this.w + 2;
+                this.cacheCanvasContext.canvas.height = this.h + 2;
                 this.layer.draw(this.cacheCanvasContext);
                 this.cacheCanvasContext.restore();
+                if (this.draw) {
+                    this.draw(this.cacheCanvasContext);
+                }
             }
-            const [width, height] = this.layer.size;
-            const { a, b, c, d } = this.layer.matrix;
 
-            ctx.drawImage(this.cacheCanvasContext.canvas, this.x - 1, this.y - 1, this.layer.w, this.layer.h);
+            ctx.drawImage(this.cacheCanvasContext.canvas, this.x - 1, this.y - 1, this.w, this.h);
         }
         if (this.subViews.length) {
             this.subViews.forEach(v => v.render(ctx));

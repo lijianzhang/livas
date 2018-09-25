@@ -1,10 +1,11 @@
 import View from './view';
-
+import Event from '../utils/event';
+import Selector from '../tools/view-selector';
 /*
  * @Author: lijianzhang
  * @Date: 2018-09-25 21:01:24
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 00:15:38
+ * @Last Modified time: 2018-09-26 04:07:11
  */
 
  export default class StageView extends View {
@@ -19,7 +20,13 @@ import View from './view';
         canvas.width = w;
         canvas.height = h;
         this.forceUpdate();
+        this.event = new Event(this);
+        this.selector = new Selector();
      }
+
+     public event: Event;
+
+     public selector: Selector;
 
      private willDraw = false;
 
