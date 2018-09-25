@@ -10,7 +10,7 @@ stage.layer.borderColor = '#000';
 const view = new View(200, 200, 50, 50);
 view.layer.backgroundColor = '#0ff';
 
-const view2 = new View(0, 0, 50, 50);
+const view2 = new View(20, 0, 50, 50);
 
 const layer = new Layer(20, 20, 20, 20);
 layer.backgroundColor = '#000';

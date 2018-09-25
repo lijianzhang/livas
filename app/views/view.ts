@@ -1,4 +1,5 @@
 import Layer from '../layers/layer';
+import Responder from './responder';
 import cachePool from '../utils/cache-pool';
 import { Observer } from 'liob';
 
@@ -6,10 +7,10 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-09-25 20:57:50
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 02:14:15
+ * @Last Modified time: 2018-09-26 02:26:45
  */
 
-export default class View {
+export default class View extends Responder {
 
     get cacheCanvasContext() {
         if (this._cacheCanvasContext) return this._cacheCanvasContext;
@@ -25,6 +26,7 @@ export default class View {
         return false;
     }
     constructor(x: number, y: number, w: number, h: number) {
+        super();
         this.layer = new Layer(x, y, w, h);
         this.$observer = new Observer(() => {
             this.forceUpdate();
