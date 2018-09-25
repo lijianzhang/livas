@@ -7,7 +7,7 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-09-25 20:57:50
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 02:26:45
+ * @Last Modified time: 2018-09-26 02:44:11
  */
 
 export default class View extends Responder {
@@ -67,12 +67,14 @@ export default class View extends Responder {
         const index = this.subViews.findIndex(v => v === view);
         this.subViews.splice(index, 1);
         view.superView = undefined;
+        view.layer.subLayers = undefined;
         view.destory();
     }
 
     public addView<T extends View>(view: T) {
         this.subViews.push(view);
         view.superView = this;
+        view.layer.superLayer = this.layer;
     }
 
     public addViews<T extends View>(views: T[]) {
