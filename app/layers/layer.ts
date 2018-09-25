@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-09-25 15:32:46
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 02:01:07
+ * @Last Modified time: 2018-09-26 02:05:49
  */
 import Matrix from '../utils/matrix';
 import { observable } from 'liob';
@@ -100,7 +100,11 @@ export default class Layer {
         }
 
         if (this.subLayers.length) {
-            this.subLayers.forEach(l => l.draw(ctx));
+            this.subLayers.forEach(l => {
+                ctx.translate(l.x, l.y);
+                l.draw(ctx);
+                ctx.translate(-l.x, -l.y);
+            });
         }
     }
 }
