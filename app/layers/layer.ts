@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-09-25 15:32:46
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 02:05:49
+ * @Last Modified time: 2018-09-26 02:13:51
  */
 import Matrix from '../utils/matrix';
 import { observable } from 'liob';
@@ -83,7 +83,7 @@ export default class Layer {
 
     public draw(ctx: CanvasRenderingContext2D) {
         if (!this.matrix.isEmpty) {
-            ctx.translate(Math.ceil(ctx.canvas.width / 2), Math.ceil(ctx.canvas.height / 2));
+            ctx.translate(Math.ceil(this.w / 2), Math.ceil(this.h / 2));
             ctx.transform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 0, 0);
             ctx.translate(-Math.ceil(this.size[0] / 2), -Math.ceil(this.size[1] / 2));
         }
@@ -101,9 +101,10 @@ export default class Layer {
 
         if (this.subLayers.length) {
             this.subLayers.forEach(l => {
+                ctx.save();
                 ctx.translate(l.x, l.y);
                 l.draw(ctx);
-                ctx.translate(-l.x, -l.y);
+                ctx.restore();
             });
         }
     }

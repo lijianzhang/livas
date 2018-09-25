@@ -14,8 +14,8 @@ const view2 = new View(0, 0, 50, 50);
 
 const layer = new Layer(20, 20, 20, 20);
 layer.backgroundColor = '#000';
-
-const layer1 = new Layer(-10, 30, 20, 20);
+layer.matrix.rotate = 45;
+const layer1 = new Layer(20, 20, 20, 20);
 layer1.backgroundColor = '#00F';
 view.layer.addLayer(layer);
 view.layer.addLayer(layer1);

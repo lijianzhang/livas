@@ -6,7 +6,7 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-09-25 20:57:50
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 01:49:11
+ * @Last Modified time: 2018-09-26 02:14:15
  */
 
 export default class View {
