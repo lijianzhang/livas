@@ -1,11 +1,12 @@
 import View from './view';
 import Event from '../utils/event';
 import Selector from '../tools/view-selector';
+import Tool from '../tools/tool';
 /*
  * @Author: lijianzhang
  * @Date: 2018-09-25 21:01:24
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 04:07:11
+ * @Last Modified time: 2018-09-26 15:21:00
  */
 
  export default class StageView extends View {
@@ -21,21 +22,34 @@ import Selector from '../tools/view-selector';
         canvas.height = h;
         this.forceUpdate();
         this.event = new Event(this);
-        this.selector = new Selector();
+        const selector = new Selector();
+        this.registerTool(selector);
      }
 
      public event: Event;
 
-     public selector: Selector;
+     public tools: Tool[] = [];
 
      private willDraw = false;
 
      private ctx: CanvasRenderingContext2D;
 
+     public registerTool(tool: Tool) {
+         tool.superView = this;
+         this.tools.push(tool);
+     }
+
      public forceUpdate() {
         if (this.willDraw) return;
         this.willDraw = true;
         requestAnimationFrame(this.update);
+    }
+
+    public render(ctx: CanvasRenderingContext2D) {
+        super.render(ctx);
+        if (this.tools.length) {
+            this.tools.forEach(t => t.render(ctx));
+        }
     }
 
      private update = () => {

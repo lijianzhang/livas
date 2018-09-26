@@ -2,6 +2,7 @@ import View from '../views/view';
 import Stage from '../views/stage';
 import { getElementOffset } from './dom';
 import globalStore from '../store/global';
+import Tool from '../tools/tool';
 
 export interface IViewEvent {
     subViews?: IViewEvent[];
@@ -40,15 +41,34 @@ export default class Event {
         return getElementOffset(e.target);
     }
 
+    public getMouseView(xy: [number, number]) {
+        let currentView: View;
+        for (let index = 0; index < this.stage.tools.length; index += 1) {
+            const view = this.stage.tools[index].hitTest(xy);
+            if (view) {
+                currentView = view;
+                break;
+            }
+        }
+        if (currentView) return currentView;
+
+        return this.stage.hitTest(xy);
+    }
+
     private onMouseDown = (e: MouseEvent) => {
         this.mousedown = true;
-        let currentView = this.stage.hitTest(globalStore.mouse.pos);
         globalStore.mouse.pos = [e.offsetX, e.offsetY];
-        globalStore.currentView = currentView;
+        let currentView = this.getMouseView(globalStore.mouse.pos);
+
+        if (!(currentView instanceof Tool)) {
+            globalStore.currentView = currentView;
+        }
+        globalStore.mouse.target = currentView;
 
         let bubbling = true;
         while (bubbling && currentView) {
             bubbling = currentView.onMouseDown ? !!currentView.onMouseDown(globalStore.mouse) : true;
+            console.log(currentView);
             if (!this.dragView && currentView.onMouseDrag) this.dragView = currentView;
             if (currentView.superView) {
                 currentView = currentView.superView;
@@ -61,9 +81,10 @@ export default class Event {
     private onMouseMove = (e: MouseEvent) => {
         const preViews = this.currentViews;
         const currentViews: Set<View> = new Set();
+        globalStore.mouse.prePos = globalStore.mouse.pos;
+        globalStore.mouse.pos = [e.offsetX, e.offsetY];
 
-        let currentView = this.stage.hitTest([e.offsetX, e.offsetY]);
-        console.log(currentView);
+        let currentView = this.getMouseView([e.offsetX, e.offsetY]);
 
         if (this.mousedown && this.dragView) {
             this.dragView.onMouseDrag!(globalStore.mouse);

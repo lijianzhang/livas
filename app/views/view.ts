@@ -7,7 +7,7 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-09-25 20:57:50
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 04:48:19
+ * @Last Modified time: 2018-09-26 17:58:30
  */
 
 let id = 0;
@@ -61,6 +61,9 @@ export default class View extends Responder {
         }, `${this.constructor.name}.render()`);
     }
 
+    // 按顺序 n, wn, w, ws, s, se, e, ne
+    public dots = 0b11111111;
+
     public id: number;
 
     public layer: Layer;
@@ -70,6 +73,8 @@ export default class View extends Responder {
     public superView?: View;
 
     public useCache = true;
+
+    public lock = false;
 
     private $observer: Observer;
 
@@ -118,17 +123,16 @@ export default class View extends Responder {
     }
 
     public hitTest(pos: [number, number]) {
-        const [x, y] = pos;
-        console.log(x, y);
-        if (x >= this.x && x <= this.layer.w + this.x && y >= this.y && y <= this.layer.h + this.y) {
+        if (this.lock) return null;
 
+        const [x, y] = pos;
+        if (x >= this.x && x <= this.w + this.x && y >= this.y && y <= this.h + this.y) {
             if (this.subViews.length) {
                 for (let index = 0; index < this.subViews.length; index += 1) {
                     const view = this.subViews[index].hitTest(pos);
-                    if (view && !view.draw) {
-                        return view;
-                    }
+                    if (view) return view;
                 }
+
             }
 
             return this;
@@ -153,8 +157,9 @@ export default class View extends Responder {
                 this.cacheCanvasContext.save();
                 this.cacheCanvasContext.canvas.width = this.w + 2;
                 this.cacheCanvasContext.canvas.height = this.h + 2;
+                this.cacheCanvasContext.translate(1.5, 1.5);
                 this.layer.draw(this.cacheCanvasContext);
-                this.cacheCanvasContext.restore();
+               this.cacheCanvasContext.restore();
                 if (this.draw) {
                     this.draw(this.cacheCanvasContext);
                 }

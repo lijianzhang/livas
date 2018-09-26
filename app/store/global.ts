@@ -1,10 +1,13 @@
 import View from '../views/view';
 import { observable } from 'liob';
+import Tool from '../tools/tool';
 
 @observable
 export class GlobalStore {
 
     public currentView?: View;
+
+    public currentTool?: Tool;
 
     public isSelect = false;
 
@@ -13,10 +16,8 @@ export class GlobalStore {
     public mouse: {
         prePos: [number, number];
         pos: [number, number];
-    } = {
-        prePos: [0, 0],
-        pos: [0, 0]
-    };
+        target: View;
+    } = {} as any;
 
     public context!: CanvasRenderingContext2D;
 }
