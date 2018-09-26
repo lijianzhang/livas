@@ -7,7 +7,7 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-09-25 20:57:50
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 17:58:30
+ * @Last Modified time: 2018-09-26 18:02:32
  */
 
 let id = 0;
@@ -16,7 +16,14 @@ export default class View extends Responder {
     get cacheCanvasContext() {
         if (this._cacheCanvasContext) return this._cacheCanvasContext;
         if (!this.useCache) return false;
-        const cache = cachePool.getCache();
+        let cache: CanvasRenderingContext2D;
+
+        if (typeof this.useCache === 'string') {
+            const cache = cachePool.getCacheWithId(this.useCache);
+        } else {
+            cache = cachePool.getCache();
+        }
+
         if (cache) {
             this._cacheCanvasContext = cache;
             this._cacheCanvasContext.imageSmoothingEnabled = false;
@@ -72,7 +79,7 @@ export default class View extends Responder {
 
     public superView?: View;
 
-    public useCache = true;
+    public useCache: boolean | string = true;
 
     public lock = false;
 

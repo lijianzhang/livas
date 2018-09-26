@@ -16,7 +16,7 @@ export interface ISelectControlDelegate {
  * @Author: lijianzhang
  * @Date: 2018-09-26 03:28:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 17:59:04
+ * @Last Modified time: 2018-09-26 18:04:23
  */
  export default class ViewSelectorControl extends Tool {
 
@@ -39,6 +39,8 @@ export interface ISelectControlDelegate {
 
         return this.superView.y + this.xy[1];
     }
+
+    public useCache = 'selecotrControl';
 
     get xy() {
         if (!this.superView) return [0, 0];

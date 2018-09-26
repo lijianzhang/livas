@@ -28,7 +28,7 @@ class CachePool {
             return cache;
         } else {
             cache = this.getCache();
-            this[id] = cache;
+            this.idCaches[id] = cache;
         }
 
         return cache;
