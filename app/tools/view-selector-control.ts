@@ -16,7 +16,7 @@ export interface ISelectControlDelegate {
  * @Author: lijianzhang
  * @Date: 2018-09-26 03:28:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 18:04:23
+ * @Last Modified time: 2018-09-27 00:24:27
  */
  export default class ViewSelectorControl extends Tool {
 
@@ -80,10 +80,35 @@ export interface ISelectControlDelegate {
     private direction: IDirection;
 
     public onMouseDrag(e: IEvent) {
-        const diffX = e.pos[0] - e.prePos[0];
-        const diffY = e.pos[1] - e.prePos[1];
+        let diffX = e.pos[0] - e.prePos[0];
+        let diffY = e.pos[1] - e.prePos[1];
 
-        globalStore.currentView.layer._matrix.multiply({ tx: -diffX, ty: -diffY });
+
+
+        if (/^[we]$/.test(this.direction)) {
+            diffY = 0;
+        } else if (/^[ns]$/.test(this.direction)) {
+            diffX = 0;
+        }
+
+
+        if (/w/.test(this.direction)) {
+            this.delegate.selectView.x += diffX;
+            diffX = -diffX;
+        }
+
+
+        if (/n/.test(this.direction)) {
+            this.delegate.selectView.y += diffY;
+            diffY = -diffY;
+        }
+
+        // if (this.delegate.selectView.size[0] < 0) diffX = -diffX;
+        // if (this.delegate.selectView.size[1] < 0) diffY = -diffY;
+
+        console.log('diffx', diffX);
+        this.delegate.selectView.w += diffX;
+        this.delegate.selectView.h += diffY;
     }
 
     public render(ctx: CanvasRenderingContext2D) {

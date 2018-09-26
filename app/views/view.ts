@@ -7,7 +7,7 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-09-25 20:57:50
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 18:02:32
+ * @Last Modified time: 2018-09-27 01:02:56
  */
 
 let id = 0;
@@ -42,6 +42,11 @@ export default class View extends Responder {
         return this.layer.x;
     }
 
+    set x(v: number) {
+        const diffX = this.x - this.layer.x;
+        this.layer.x = v - diffX;
+    }
+
     get y() {
         if (this.superView) {
             return this.superView.y + this.layer.y;
@@ -50,12 +55,30 @@ export default class View extends Responder {
         return this.layer.y;
     }
 
+    set y(v: number) {
+        const diffY = this.y - this.layer.y;
+        this.layer.y = v - diffY;
+    }
+
+
+    get size() {
+        return this.layer.size;
+    }
+
     get w() {
         return this.layer.w;
     }
 
+    set w(v: number) {
+        this.layer.w = v;
+    }
+
     get h() {
         return this.layer.h;
+    }
+
+    set h(v: number) {
+        this.layer.h = v;
     }
 
     constructor(x: number, y: number, w: number, h: number) {
@@ -94,6 +117,28 @@ export default class View extends Responder {
      */
     private _cacheCanvasContext?: CanvasRenderingContext2D;
 
+    public setSize(w: number, h: number) {
+        this.layer.w = w;
+        this.layer.h = h;
+    }
+
+    public rotate(deg: number) {
+        this.layer.rotate(deg);
+    }
+
+    public scale(x: number, y: number) {
+        this.layer.scale(x, y);
+    }
+
+    public translate(tx: number, ty: number) {
+        this.layer.translate(tx, ty);
+    }
+
+    /**
+     *
+     * @param {CanvasRenderingContext2D} ctx
+     * @memberof View
+     */
     public draw?(ctx: CanvasRenderingContext2D);
 
     /**
@@ -149,6 +194,8 @@ export default class View extends Responder {
     }
 
     public render(ctx: CanvasRenderingContext2D) {
+
+        if (!this.w || !this.h) return undefined;
         this.$observer.beginCollectDep();
         if (!this.cacheCanvasContext) {
             ctx.save();
@@ -162,8 +209,8 @@ export default class View extends Responder {
         } else {
             if (this.$observer.change) {
                 this.cacheCanvasContext.save();
-                this.cacheCanvasContext.canvas.width = this.w + 2;
-                this.cacheCanvasContext.canvas.height = this.h + 2;
+                this.cacheCanvasContext.canvas.width = Math.abs(this.w) + 2;
+                this.cacheCanvasContext.canvas.height = Math.abs(this.h) + 2;
                 this.cacheCanvasContext.translate(1.5, 1.5);
                 this.layer.draw(this.cacheCanvasContext);
                this.cacheCanvasContext.restore();

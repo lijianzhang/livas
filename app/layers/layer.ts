@@ -2,27 +2,13 @@
  * @Author: lijianzhang
  * @Date: 2018-09-25 15:32:46
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 04:47:48
+ * @Last Modified time: 2018-09-27 01:02:42
  */
 import Matrix from '../utils/matrix';
 import { observable } from 'liob';
 
 @observable
 export default class Layer {
-    constructor(x: number, y: number, w: number, h: number) {
-        this.postion = [x, y];
-        this.size = [w, h];
-    }
-
-    public superLayer?: Layer;
-
-    public subLayers: Layer[] = [];
-
-    public postion: [number, number];
-
-    public size: [number, number];
-
-    public anchor: [number, number] = [0.5, 0.5];
 
 
     get x() {
@@ -52,11 +38,42 @@ export default class Layer {
     }
 
     get w() {
-        return Math.ceil(Math.abs(this.matrix.a) * this.size[0] +  Math.abs(this.matrix.c) * this.size[1]);
+        return  Math.ceil(this.matrix.a * this.size[0] +  this.matrix.c * this.size[1]);
     }
+
+    set w(value: number) {
+        this.size[0] = (value - this.matrix.c * this.size[1]) / this.matrix.a;
+    }
+
     get h() {
-        return Math.ceil(Math.abs(this.matrix.b) * this.size[0] +  Math.abs(this.matrix.d) * this.size[1]);
+        return Math.ceil(this.matrix.b * this.size[0] +  this.matrix.d * this.size[1]);
     }
+
+    set h(value: number) {
+        this.size[1] = (value - this.matrix.b * this.size[0]) / this.matrix.d;
+    }
+
+    get matrix() {
+        if (this.superLayer) {
+            return this._matrix.copy().multiply(this.superLayer.matrix);
+        }
+
+        return this._matrix;
+    }
+    constructor(x: number, y: number, w: number, h: number) {
+        this.postion = [x, y];
+        this.size = [w, h];
+    }
+
+    public superLayer?: Layer;
+
+    public subLayers: Layer[] = [];
+
+    public postion: [number, number];
+
+    public size: [number, number];
+
+    public anchor: [number, number] = [0, 0];
 
     public backgroundColor?: string;
 
@@ -66,12 +83,16 @@ export default class Layer {
 
     public _matrix = Matrix.default;
 
-    get matrix() {
-        if (this.superLayer) {
-            return this._matrix.copy().multiply(this.superLayer.matrix);
-        }
+    public rotate(deg: number) {
+        this._matrix.rotate(deg);
+    }
 
-        return this._matrix;
+    public scale(x: number, y: number) {
+        this._matrix.scale(x, y);
+    }
+
+    public translate(tx: number, ty: number) {
+        this._matrix.translate(tx, ty);
     }
 
     public removeLayer<T extends Layer>(layer: T) {

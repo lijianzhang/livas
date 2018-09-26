@@ -7,43 +7,6 @@ export default class Matrix {
     get isEmpty() {
         return this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1 && this.tx === 0 && this.ty === 0;
     }
-    get translate() {
-        return [this.tx, this.ty];
-    }
-
-    set translate(xy: [number, number]) {
-        this.multiply({ tx: xy[0], ty: xy[1] });
-    }
-
-    get rotate() {
-        const a = this.a;
-        const b = this.b;
-        const c = this.c;
-        const d = this.d;
-        const skewX = -Math.atan2(-c, d);
-        const skewY = Math.atan2(b, a);
-        const delta = Math.abs(skewX + skewY);
-        let rotation = 0;
-        if (delta < 0.00001 || Math.abs(Math.PI / 2 - delta) < 0.00001) {
-            rotation = skewY;
-            if (a < 0 && d >= 0) {
-                rotation += (rotation <= 0) ? Math.PI : -Math.PI;
-            }
-
-        }
-
-        return rotation;
-    }
-
-    set rotate(angle: number) {
-        let a = angle % 360;
-        if (a > 180) a -= 360;
-        else if (a < -180) a += 360;
-
-        const cos = Math.cos(angle * Math.PI / 180);
-        const sin = Math.sin(angle * Math.PI / 180);
-        this.multiply({ a: cos, b: sin, c: -sin, d: cos });
-    }
 
     public static initWithScale(sx: number, sy: number) {
         return new Matrix(1, sx, sy, 1, 0, 0);
@@ -76,6 +39,40 @@ export default class Matrix {
     public d: number;
     public tx: number;
     public ty: number;
+
+    public translate(tx: number, ty: number) {
+        this.multiply({ tx, ty });
+    }
+
+    // get rotate() {
+    //     const a = this.a;
+    //     const b = this.b;
+    //     const c = this.c;
+    //     const d = this.d;
+    //     const skewX = -Math.atan2(-c, d);
+    //     const skewY = Math.atan2(b, a);
+    //     const delta = Math.abs(skewX + skewY);
+    //     let rotation = 0;
+    //     if (delta < 0.00001 || Math.abs(Math.PI / 2 - delta) < 0.00001) {
+    //         rotation = skewY;
+    //         if (a < 0 && d >= 0) {
+    //             rotation += (rotation <= 0) ? Math.PI : -Math.PI;
+    //         }
+
+    //     }
+
+    //     return rotation;
+    // }
+
+    public rotate(angle: number) {
+        let a = angle % 360;
+        if (a > 180) a -= 360;
+        else if (a < -180) a += 360;
+
+        const cos = Math.cos(angle * Math.PI / 180);
+        const sin = Math.sin(angle * Math.PI / 180);
+        this.multiply({ a: cos, b: sin, c: -sin, d: cos });
+    }
 
     public scale(x: number, y: number) {
         this.multiply({ a: x, d: y });
