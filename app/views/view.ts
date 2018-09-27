@@ -7,7 +7,7 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-09-25 20:57:50
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-27 01:02:56
+ * @Last Modified time: 2018-09-27 23:45:34
  */
 
 let id = 0;
@@ -171,7 +171,7 @@ export default class View extends Responder {
     }
 
     public destory() {
-        console.log('destory');
+        this.$observer.unSubscribe();
     }
 
     public hitTest(pos: [number, number]) {
@@ -194,8 +194,6 @@ export default class View extends Responder {
     }
 
     public render(ctx: CanvasRenderingContext2D) {
-
-        if (!this.w || !this.h) return undefined;
         this.$observer.beginCollectDep();
         if (!this.cacheCanvasContext) {
             ctx.save();
@@ -207,16 +205,15 @@ export default class View extends Responder {
             ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.restore();
         } else {
+            if (!this.w || !this.h) return undefined;
             if (this.$observer.change) {
                 this.cacheCanvasContext.save();
                 this.cacheCanvasContext.canvas.width = Math.abs(this.w) + 2;
                 this.cacheCanvasContext.canvas.height = Math.abs(this.h) + 2;
                 this.cacheCanvasContext.translate(1.5, 1.5);
                 this.layer.draw(this.cacheCanvasContext);
-               this.cacheCanvasContext.restore();
-                if (this.draw) {
-                    this.draw(this.cacheCanvasContext);
-                }
+                if (this.draw) this.draw(this.cacheCanvasContext);
+                this.cacheCanvasContext.restore();
             }
 
             ctx.drawImage(this.cacheCanvasContext.canvas, this.x - 1, this.y - 1, this.w, this.h);

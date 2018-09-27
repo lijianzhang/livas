@@ -6,7 +6,7 @@ import Tool from '../tools/tool';
  * @Author: lijianzhang
  * @Date: 2018-09-25 21:01:24
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 15:21:00
+ * @Last Modified time: 2018-09-27 23:44:33
  */
 
  export default class StageView extends View {

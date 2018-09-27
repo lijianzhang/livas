@@ -9,6 +9,7 @@ export interface IViewEvent {
     onMouseDown?(e: IEvent): boolean | undefined;
     onMouseUp?(e: IEvent): boolean | undefined;
     onMouseDrag?(e: IEvent);
+    onMouseDragEnd?(e: IEvent);
     onMouseMove?(e: IEvent);
     onMouseLeave?(e: IEvent);
     onMouseEnter?(e: IEvent);
@@ -24,9 +25,11 @@ export default class Event {
 
     constructor(stage: Stage) {
         this.stage = stage;
-        this.stage.canvas.addEventListener('mousedown', this.onMouseDown);
-        this.stage.canvas.addEventListener('mousemove', this.onMouseMove);
-        document.body.addEventListener('mouseup', this.onMouseUp);
+        document.addEventListener('mousedown', (e) => {
+            if (e.target === this.stage.canvas) this.onMouseDown(e);
+        });
+        document.addEventListener('mousemove', this.onMouseMove);
+        document.addEventListener('mouseup', this.onMouseUp);
     }
 
     private stage: Stage;
@@ -43,6 +46,9 @@ export default class Event {
 
     public getMouseView(xy: [number, number]) {
         let currentView: View;
+        if (globalStore.currentView) currentView = globalStore.currentView.hitTest(xy);
+        if (currentView && currentView !== globalStore.currentView) return currentView;
+
         for (let index = 0; index < this.stage.tools.length; index += 1) {
             const view = this.stage.tools[index].hitTest(xy);
             if (view) {
@@ -126,6 +132,7 @@ export default class Event {
 
     private onMouseUp = (e: MouseEvent) => {
         this.mousedown = false;
+        if (this.dragView && this.dragView.onMouseDragEnd) this.dragView.onMouseDragEnd(globalStore.mouse);
         this.dragView = undefined;
     }
 }

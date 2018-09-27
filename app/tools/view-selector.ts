@@ -7,35 +7,34 @@ import SelectorControl, { ISelectControlDelegate, directions } from './view-sele
  * @Author: lijianzhang
  * @Date: 2018-09-26 03:28:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-26 17:52:55
+ * @Last Modified time: 2018-09-27 22:28:23
  */
-
 
  export default class ViewSelector extends Tool implements ISelectControlDelegate {
 
 
     get x() {
-        if (!globalStore.currentView) return 0;
+        if (!this.selectView) return 0;
 
-        return globalStore.currentView.x;
+        return this.selectView.x;
     }
 
     get y() {
-        if (!globalStore.currentView) return 0;
+        if (!this.selectView) return 0;
 
-        return globalStore.currentView.y;
+        return this.selectView.y;
     }
 
     get w() {
-        if (!globalStore.currentView) return 0;
+        if (!this.selectView) return 0;
 
-        return globalStore.currentView.w;
+        return this.selectView.w;
     }
 
     get h() {
-        if (!globalStore.currentView) return 0;
+        if (!this.selectView) return 0;
 
-        return globalStore.currentView.h;
+        return this.selectView.h;
     }
     constructor() {
         super(0, 0, 0, 0);
@@ -48,8 +47,8 @@ import SelectorControl, { ISelectControlDelegate, directions } from './view-sele
 
     get direction() {
         const directions = [];
-        if (!globalStore.currentView) return directions;
-        const dots = globalStore.currentView.dots.toString(2).split('').reverse();
+        if (!this.selectView) return directions;
+        const dots = this.selectView.dots.toString(2).split('').reverse();
         if (dots[0]) { directions.push('ne'); }
 
         if (dots[1]) { directions.push('e'); }
@@ -70,7 +69,7 @@ import SelectorControl, { ISelectControlDelegate, directions } from './view-sele
     }
 
     get selectView() {
-        return globalStore.currentView;
+        if (globalStore.currentView && globalStore.currentView.superView) return globalStore.currentView;
     }
 
     public onMouseDrag(e: IEvent) {
@@ -78,12 +77,10 @@ import SelectorControl, { ISelectControlDelegate, directions } from './view-sele
         const diffY = e.pos[1] - e.prePos[1];
         // if (e.pos[0])
 
-        globalStore.currentView!.layer._matrix.multiply({ tx: -diffX, ty: -diffY });
+        this.selectView!.layer._matrix.multiply({ tx: -diffX, ty: -diffY });
     }
 
     public draw(ctx: CanvasRenderingContext2D) {
-        if (!globalStore.currentView) return undefined;
-        ctx.save();
         ctx.lineWidth = 1;
         ctx.strokeStyle = '#ffffff';
         ctx.strokeRect(0, 0, this.w, this.h);
@@ -92,16 +89,5 @@ import SelectorControl, { ISelectControlDelegate, directions } from './view-sele
         ctx.strokeRect(0, 0, this.w, this.h);
         ctx.closePath();
         ctx.stroke();
-        ctx.restore();
-        this.drawDot(ctx);
-    }
-
-    private drawDot(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = '#fff';
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = '#000';
-
-        const points = [];
-        const dots = globalStore.currentView.dots.toString(2).split('').reverse();
     }
  }

@@ -11,6 +11,8 @@ export default abstract class Responder implements IViewEvent {
 
     public onMouseDrag?(e: IEvent);
 
+    public onMouseDragEnd?(e: IEvent);
+
     public onMouseMove?(e: IEvent);
 
     public onMouseUp?(e: IEvent);

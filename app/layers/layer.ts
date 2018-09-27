@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-09-25 15:32:46
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-27 01:02:42
+ * @Last Modified time: 2018-09-27 23:53:37
  */
 import Matrix from '../utils/matrix';
 import { observable } from 'liob';
@@ -55,7 +55,7 @@ export default class Layer {
 
     get matrix() {
         if (this.superLayer) {
-            return this._matrix.copy().multiply(this.superLayer.matrix);
+            return this._matrix.copy().multiply({...this.superLayer.matrix, tx: 0, ty: 0});
         }
 
         return this._matrix;
