@@ -16,12 +16,52 @@
         this.ty = ty;
     }
 
-     public a: number;
-     public b: number;
-     public c: number;
-     public d: number;
-     public tx: number;
-     public ty: number;
+        /**
+         * x轴的scale值
+         *
+         * @type {number}
+         * @memberof IMatrix
+         */
+        public a: number;
+        /**
+         * y轴的skew值
+         *
+         * @type {number}
+         * @memberof IMatrix
+         */
+        public b: number;
+
+        /**
+         * x轴的skew值
+         *
+         * @type {number}
+         * @memberof IMatrix
+         */
+        public c: number;
+
+        /**
+         * y轴的scale值
+         *
+         * @type {number}
+         * @memberof IMatrix
+         */
+        public d: number;
+
+        /**
+         * x轴的偏移值
+         *
+         * @type {number}
+         * @memberof IMatrix
+         */
+        public tx: number;
+
+        /**
+         * y轴的偏移值
+         *
+         * @type {number}
+         * @memberof IMatrix
+         */
+        public ty: number;
 
      public copy() {
         return new Matrix(this.a, this.b, this.c, this.d, this.tx, this.ty);

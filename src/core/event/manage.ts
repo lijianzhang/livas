@@ -2,14 +2,15 @@
  * @Author: lijianzhang
  * @Date: 2018-10-03 03:00:18
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-10-03 19:34:17
+ * @Last Modified time: 2018-10-05 19:38:11
  */
-import Event from './event';
+import Event, { EventTypes } from './event';
 
 export default class EventManage {
     constructor(rootView: Livas.IView, canvas: HTMLCanvasElement) {
         this.rootView = rootView;
         this.canvas = canvas;
+        this.init();
     }
 
     private rootView: Livas.IView;
@@ -17,7 +18,7 @@ export default class EventManage {
     private canvas: HTMLCanvasElement;
 
     public getMouseView(point: Livas.gemo.IPoint, view: Livas.IView): Livas.IView | null {
-        if (this.rootView.hitTest(point)) {
+        if (view.hitTest(point)) {
             if (view.subViews.length) {
                 for (let index = 0; index < view.subViews.length; index += 1) {
                     const v = this.getMouseView(point, view.subViews[index]);
@@ -48,13 +49,16 @@ export default class EventManage {
             const postion = {x: e.offsetX, y: e.offsetY};
             let currentView = this.getMouseView(postion, this.rootView);
             if (currentView) {
-                const event = new Event(Livas.EventTypes.mousedown, currentView, postion);
-                while (!event.isStop && currentView) {
+                const event = new Event(EventTypes.mousedown, currentView, postion);
+                while (!event.bubbles && currentView) {
                     if (currentView.onMouseDown) currentView.onMouseDown(event);
                     if (currentView.superView) {
                         currentView = currentView.superView;
+                    } else {
+                        currentView = null;
                     }
                 }
+                console.log(event.target.id);
             }
         }
     }
@@ -63,11 +67,13 @@ export default class EventManage {
         const postion = {x: e.offsetX, y: e.offsetY};
         let currentView = this.getMouseView(postion, this.rootView);
         if (currentView) {
-            const event = new Event(Livas.EventTypes.mousemove, currentView, postion);
-            while (!event.isStop && currentView) {
+            const event = new Event(EventTypes.mousemove, currentView, postion);
+            while (!event.bubbles && currentView) {
                 if (currentView.onMouseMove) currentView.onMouseMove(event);
                 if (currentView.superView) {
                     currentView = currentView.superView;
+                } else {
+                    currentView = null;
                 }
             }
         }

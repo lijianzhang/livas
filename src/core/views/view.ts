@@ -4,7 +4,7 @@ import { Observer } from 'liob';
  * @Author: lijianzhang
  * @Date: 2018-10-03 13:52:19
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-10-03 22:11:28
+ * @Last Modified time: 2018-10-05 19:38:44
  */
 let id = 0;
 
@@ -69,8 +69,24 @@ export default class View implements Livas.IView {
         this.layer.transform = v;
     }
 
-    public hitTest() {
-        return true;
+    get globalRect() {
+        let x = this.layer.frame.x + this.layer.drawRect.x;
+        let y = this.layer.frame.x + this.layer.drawRect.y;
+
+        if (this.superView) {
+            const rect = this.superView.globalRect;
+            x += rect.x;
+            y += rect.y;
+        }
+
+        return { x, y, width: this.layer.drawRect.width, height: this.layer.drawRect.height };
+    }
+
+    public hitTest(point: Livas.gemo.IPoint) {
+        const { x, y, width, height } = this.globalRect;
+        if (point.x >= x && point.x <= x + width && point.y >= y && point.y <= y + height) return true;
+
+        return false;
     }
 
     public removeSubView<T extends View>(view: T) {

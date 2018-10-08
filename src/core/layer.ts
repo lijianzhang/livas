@@ -78,11 +78,13 @@ export default class Layer implements Livas.IBaseLayer {
 
 
     public draw(ctx: Livas.IReanderContenxt) {
-        ctx.save();
         if (!this.transform.isEmpty) {
             ctx.translate(Math.ceil(this.drawRect.width / 2), Math.ceil(this.drawRect.height / 2));
             ctx.transform(this.transform.a, this.transform.b, this.transform.c, this.transform.d, 0, 0);
             ctx.translate(-Math.ceil(this.size.width / 2), -Math.ceil(this.size.height / 2));
+
+            ctx.rect(0, 0, this.size.width, this.size.height);
+            ctx.clip();
         }
 
         if (this.backgroundColor) {
@@ -106,6 +108,5 @@ export default class Layer implements Livas.IBaseLayer {
         }
 
         if (this.delegate) this.delegate.draw(this, ctx);
-        ctx.restore();
     }
 }
