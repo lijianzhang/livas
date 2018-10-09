@@ -5,10 +5,9 @@
  * @Last Modified time: 2018-10-03 22:06:52
  */
 
-import AbstractRender from './abstract-render';
-import canvasCachePool from './canvas-cache';
-import EventManage from '../event/manage';
-import View from '../views/view';
+import { AbstractRender, View } from '../core';
+import canvasCachePool from './cache';
+import EventManage from './event-manage';
 
 export default class CanvasRender extends AbstractRender {
 
@@ -18,6 +17,7 @@ export default class CanvasRender extends AbstractRender {
         const canvas = document.createElement('canvas');
         this.context = canvas.getContext('2d')!;
         this.eventMange = new EventManage(rootView, canvas);
+        this.rootView.forceUpdate = () => {this.draw(); };
     }
 
     protected rootView: View;
@@ -71,15 +71,15 @@ export default class CanvasRender extends AbstractRender {
             }
             context.drawImage(
                 ctx.canvas,
-                view.layer.frame.x + view.layer.drawRect.x - 1,
-                view.layer.frame.y + view.layer.drawRect.y - 1,
+                view.layer.drawRect.x - 1,
+                view.layer.drawRect.y - 1,
                 view.layer.drawRect.width,
                 view.layer.drawRect.height
             );
             ctx.restore();
         } else {
             ctx.save();
-            ctx.translate(view.layer.frame.x + view.layer.drawRect.x, view.layer.frame.y + view.layer.drawRect.y);
+            ctx.translate(view.layer.drawRect.x, view.layer.drawRect.y);
             view.render(ctx);
             if (view.subViews.length) {
                 view.subViews.forEach(v => this.drawView(v, ctx));

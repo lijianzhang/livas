@@ -1,10 +1,11 @@
+
 /*
  * @Author: lijianzhang
  * @Date: 2018-10-03 03:00:18
  * @Last Modified by: lijianzhang
  * @Last Modified time: 2018-10-05 19:38:11
  */
-import Event, { EventTypes } from './event';
+import { Event, EventTypes } from '../core';
 
 export default class EventManage {
     constructor(rootView: Livas.IView, canvas: HTMLCanvasElement) {

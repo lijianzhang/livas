@@ -1,4 +1,4 @@
-import Layer from '../layer';
+import Layer from './layer';
 import { Observer } from 'liob';
 /*
  * @Author: lijianzhang
@@ -70,8 +70,8 @@ export default class View implements Livas.IView {
     }
 
     get globalRect() {
-        let x = this.layer.frame.x + this.layer.drawRect.x;
-        let y = this.layer.frame.x + this.layer.drawRect.y;
+        let x = this.layer.drawRect.x;
+        let y = this.layer.drawRect.y;
 
         if (this.superView) {
             const rect = this.superView.globalRect;
@@ -84,7 +84,17 @@ export default class View implements Livas.IView {
 
     public hitTest(point: Livas.gemo.IPoint) {
         const { x, y, width, height } = this.globalRect;
-        if (point.x >= x && point.x <= x + width && point.y >= y && point.y <= y + height) return true;
+        const anchorPointX = this.bounds.width * this.layer.anchorPoint.x;
+        const anchorPointY = this.bounds.height * this.layer.anchorPoint.y;
+        const transform = this.transform.copy().inverted();
+        const xx = (point.x - x - anchorPointX) * transform.a + (point.y - y - anchorPointY) * transform.c + anchorPointX;
+        const yy = (point.x - x - anchorPointX) * transform.b + (point.y - y - anchorPointY) * transform.d + anchorPointY;
+        console.log(this.id, 'point', xx, yy);
+        console.log('anchorPointX', anchorPointX);
+        console.log('anchorPointY', anchorPointY);
+        console.log('point.x - x', point.x - x);
+        console.log('point.y - y', point.y - y);
+        if (xx >= 0 && xx <= width && yy >= 0 && yy <= height) return true;
 
         return false;
     }
@@ -93,11 +103,13 @@ export default class View implements Livas.IView {
         const index = this.subViews.findIndex(v => v === view);
         this.subViews.splice(index, 1);
         view.superView = undefined;
+        this.forceUpdate();
     }
 
     public addSubView<T extends View>(layer: T) {
         this.subViews.push(layer);
         layer.superView = this;
+        this.forceUpdate();
     }
 
     public addSubViews<T extends View>(views: T[]) {

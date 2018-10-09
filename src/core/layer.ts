@@ -1,12 +1,13 @@
-import Matrix from './geom/matrix';
-import Rect from './geom/rect';
-import { observable, computed } from 'liob';
 /*
  * @Author: lijianzhang
  * @Date: 2018-10-02 23:37:17
  * @Last Modified by: lijianzhang
  * @Last Modified time: 2018-10-03 22:11:05
  */
+import Matrix from './geom/matrix';
+import Rect from './geom/rect';
+import { observable, computed } from 'liob';
+
 
 let id = 0;
 
@@ -35,7 +36,7 @@ export default class Layer implements Livas.IBaseLayer {
         return { width: this.frame.width, height: this.frame.height };
     }
 
-    public anchorPoint = {x: 0, y: 0};
+    public anchorPoint = {x: 0.5, y: 0.5};
 
     public transform = new Matrix();
 
@@ -66,14 +67,25 @@ export default class Layer implements Livas.IBaseLayer {
 
     @computed
     public get drawRect() {
-        const rect = this.bounds;
 
-        const p1 = this.transform.transformPoint(rect.x, rect.y);
-        const p2 = this.transform.transformPoint(rect.x + rect.width, rect.y);
-        const p3 = this.transform.transformPoint(rect.x + rect.width, rect.y + rect.height);
-        const p4 = this.transform.transformPoint(rect.x, rect.y + rect.height);
+        if (this.transform.isEmpty) {
+            return this.frame;
+        }
 
-        return Rect.createFromPoints(p1, p2, p3, p4);
+        const { x, y, width, height } = this.bounds;
+
+        const p1 = this.transform.transformPoint(x, y);
+        const p2 = this.transform.transformPoint(x + width, y);
+        const p3 = this.transform.transformPoint(x + width, y + height);
+        const p4 = this.transform.transformPoint(x, y + height);
+
+        const rect = Rect.createFromPoints(p1, p2, p3, p4);
+
+        const p5 = this.transform.transformPoint(width * this.anchorPoint.x, height * this.anchorPoint.y);
+        rect.x += (width * this.anchorPoint.x - p5.x) + this.frame.x;
+        rect.y += (height * this.anchorPoint.y - p5.y) + this.frame.y;
+
+        return rect;
     }
 
 
