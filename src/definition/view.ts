@@ -61,6 +61,6 @@
          * @returns {boolean}
          * @memberof IView
          */
-        hitTest(point: gemo.IPoint): boolean;
+        hitTest(point: gemo.IPoint): IView | null;
      }
  }

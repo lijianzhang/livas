@@ -70,8 +70,8 @@ export default class View implements Livas.IView {
     }
 
     get globalRect() {
-        let x = this.layer.drawRect.x;
-        let y = this.layer.drawRect.y;
+        let x = this.frame.x;
+        let y = this.frame.y;
 
         if (this.superView) {
             const rect = this.superView.globalRect;
@@ -79,24 +79,29 @@ export default class View implements Livas.IView {
             y += rect.y;
         }
 
-        return { x, y, width: this.layer.drawRect.width, height: this.layer.drawRect.height };
+        return { x, y, width: this.frame.width, height: this.frame.height };
     }
 
-    public hitTest(point: Livas.gemo.IPoint) {
-        const { x, y, width, height } = this.globalRect;
-        const anchorPointX = this.bounds.width * this.layer.anchorPoint.x;
-        const anchorPointY = this.bounds.height * this.layer.anchorPoint.y;
-        const transform = this.transform.copy().inverted();
-        const xx = (point.x - x - anchorPointX) * transform.a + (point.y - y - anchorPointY) * transform.c + anchorPointX;
-        const yy = (point.x - x - anchorPointX) * transform.b + (point.y - y - anchorPointY) * transform.d + anchorPointY;
-        console.log(this.id, 'point', xx, yy);
-        console.log('anchorPointX', anchorPointX);
-        console.log('anchorPointY', anchorPointY);
-        console.log('point.x - x', point.x - x);
-        console.log('point.y - y', point.y - y);
-        if (xx >= 0 && xx <= width && yy >= 0 && yy <= height) return true;
 
-        return false;
+    public hitTest(point: Livas.gemo.IPoint) {
+        const { x, y, width, height } = this.frame;
+        const xx = point.x - x - this.layer.anchorPoint.x * this.bounds.width;
+        const yy = point.y - y - this.layer.anchorPoint.y * this.bounds.height;
+
+        const p = this.transform.copy().inverted().transformPoint(xx, yy);
+
+        if (p.x >= 0 && p.x <= width && p.y >= 0 && p.y <= height) {
+            if (this.subViews.length) {
+                for (let index = 0; index < this.subViews.length; index += 1) {
+                    const v = this.subViews[index].hitTest(p);
+                    if (v) return v;
+                }
+            }
+
+            return this;
+        }
+
+        return null;
     }
 
     public removeSubView<T extends View>(view: T) {
@@ -106,9 +111,9 @@ export default class View implements Livas.IView {
         this.forceUpdate();
     }
 
-    public addSubView<T extends View>(layer: T) {
-        this.subViews.push(layer);
-        layer.superView = this;
+    public addSubView<T extends View>(view: T) {
+        this.subViews.push(view);
+        view.superView = this;
         this.forceUpdate();
     }
 

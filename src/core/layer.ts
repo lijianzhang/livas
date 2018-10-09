@@ -36,7 +36,7 @@ export default class Layer implements Livas.IBaseLayer {
         return { width: this.frame.width, height: this.frame.height };
     }
 
-    public anchorPoint = {x: 0.5, y: 0.5};
+    public anchorPoint = {x: 0, y: 0};
 
     public transform = new Matrix();
 

@@ -20,7 +20,7 @@ declare namespace Livas {
 
         onMouseUp?(e: IEvent);
 
-        hitTest(pos: gemo.IPoint): boolean;
+        hitTest(pos: gemo.IPoint): IResponder | null;
     }
 }
 

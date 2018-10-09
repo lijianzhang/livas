@@ -18,20 +18,6 @@ export default class EventManage {
 
     private canvas: HTMLCanvasElement;
 
-    public getMouseView(point: Livas.gemo.IPoint, view: Livas.IView): Livas.IView | null {
-        if (view.hitTest(point)) {
-            if (view.subViews.length) {
-                for (let index = 0; index < view.subViews.length; index += 1) {
-                    const v = this.getMouseView(point, view.subViews[index]);
-                    if (v) return v;
-                }
-            }
-
-            return view;
-        }
-
-        return null;
-    }
 
     public destroy() {
         this.canvas.removeEventListener('mousedown', this.onMouseDown);
@@ -48,7 +34,7 @@ export default class EventManage {
     private onMouseDown = (e: MouseEvent) => {
         if (e.target === this.canvas) {
             const postion = {x: e.offsetX, y: e.offsetY};
-            let currentView = this.getMouseView(postion, this.rootView);
+            let currentView = this.rootView.hitTest(postion);
             if (currentView) {
                 const event = new Event(EventTypes.mousedown, currentView, postion);
                 while (!event.bubbles && currentView) {
@@ -66,7 +52,7 @@ export default class EventManage {
 
     private onMouseMove = (e: MouseEvent) => {
         const postion = {x: e.offsetX, y: e.offsetY};
-        let currentView = this.getMouseView(postion, this.rootView);
+        let currentView = this.rootView.hitTest(postion);
         if (currentView) {
             const event = new Event(EventTypes.mousemove, currentView, postion);
             while (!event.bubbles && currentView) {
