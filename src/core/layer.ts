@@ -36,7 +36,7 @@ export default class Layer implements Livas.IBaseLayer {
         return { width: this.frame.width, height: this.frame.height };
     }
 
-    public anchorPoint = {x: 0, y: 0};
+    public anchorPoint = { x: 0.5, y: 0.5 };
 
     public transform = new Matrix();
 
@@ -94,10 +94,10 @@ export default class Layer implements Livas.IBaseLayer {
             ctx.translate(Math.ceil(this.drawRect.width / 2), Math.ceil(this.drawRect.height / 2));
             ctx.transform(this.transform.a, this.transform.b, this.transform.c, this.transform.d, 0, 0);
             ctx.translate(-Math.ceil(this.size.width / 2), -Math.ceil(this.size.height / 2));
-
-            ctx.rect(0, 0, this.size.width, this.size.height);
-            ctx.clip();
         }
+
+        ctx.rect(-0.5, -0.5, this.size.width + 1, this.size.height + 1);
+        ctx.clip();
 
         if (this.backgroundColor) {
             ctx.fillStyle = this.backgroundColor;

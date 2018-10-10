@@ -58,23 +58,29 @@ export default class CanvasRender extends AbstractRender {
             ctx = canvasCachePool.getCacheById(view.cacheKey);
             ctx.save();
 
-            const width = view.layer.drawRect.width;
-            const height = view.layer.drawRect.height;
+            const width = Math.ceil(view.layer.drawRect.width) + 1;
+            const height = Math.ceil(view.layer.drawRect.height) + 1;
             ctx.save();
-            ctx.canvas.height = height * 2 + 2;
             ctx.canvas.width = width * 2 + 2;
+            ctx.canvas.height = height * 2 + 2;
             ctx.scale(2, 2);
-            ctx.translate(0.5, 0.5);
+            ctx.translate(1, 1);
             view.render(ctx);
+
             if (view.subViews.length) {
                 view.subViews.forEach(v => this.drawView(v, ctx));
             }
+
             context.drawImage(
                 ctx.canvas,
-                view.layer.drawRect.x - 1,
-                view.layer.drawRect.y - 1,
-                view.layer.drawRect.width,
-                view.layer.drawRect.height
+                1,
+                1,
+                ctx.canvas.width - 0.5,
+                ctx.canvas.height - 0.5,
+                view.layer.drawRect.x,
+                view.layer.drawRect.y,
+                width,
+                height
             );
             ctx.restore();
         } else {

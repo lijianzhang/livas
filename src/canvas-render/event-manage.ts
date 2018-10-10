@@ -45,7 +45,6 @@ export default class EventManage {
                         currentView = null;
                     }
                 }
-                console.log(event.target.id);
             }
         }
     }
